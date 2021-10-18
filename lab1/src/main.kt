@@ -1,29 +1,12 @@
+import ui.KotlinSwingSimpleEx
+
 import java.awt.EventQueue
-import javax.swing.*
 
-class KotlinSwingSimpleEx(title: String) : JFrame()
-{
-    init
-    {
-        createUI(title)
-    }
-
-    private fun createUI(title: String)
-    {
-
-        setTitle(title)
-
-        defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-        setSize(300, 200)
-        setLocationRelativeTo(null)
-    }
-}
-
-private fun createAndShowGUI()
+fun createAndShowGUI()
 {
 
-    val frame = KotlinSwingSimpleEx("Simple")
-    frame.isVisible = true
+        val frame = KotlinSwingSimpleEx("Моделирование. ЛР1, Якуба Дмитрий, ИУ7-73Б")
+        frame.isVisible = true
 }
 
 fun main()
