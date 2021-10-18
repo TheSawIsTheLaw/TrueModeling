@@ -1,5 +1,8 @@
 package ui
+
 import java.awt.*
+import java.awt.event.ActionListener
+import java.lang.NumberFormatException
 import javax.swing.*
 
 class DistributionWindowApp(title: String) : JFrame()
@@ -58,16 +61,33 @@ class DistributionWindowApp(title: String) : JFrame()
         return outButton
     }
 
+    private fun checkInputParameters(firstParameter: String, secondParameter: String): Boolean
+    {
+        try
+        {
+            firstParameter.toFloat()
+            secondParameter.toFloat()
+        } catch (exc: NumberFormatException)
+        {
+            return false
+        }
+
+        return true
+    }
+
     private fun prepareAndPlaceParametersPanel()
     {
         val parametersPanel = JPanel()
         parametersPanel.border = BorderFactory.createTitledBorder("Распределение и параметры")
         val firstParameterLabel = makeJLabel(pairOfEvenDistributionParameters.first)
         parametersPanel.add(firstParameterLabel)
-        parametersPanel.add(makeJInput())
+        val firstInput = makeJInput()
+        parametersPanel.add(firstInput)
         val secondParameterLabel = makeJLabel(pairOfEvenDistributionParameters.second)
         parametersPanel.add(secondParameterLabel)
-        parametersPanel.add(makeJInput())
+        val secondInput = makeJInput()
+        parametersPanel.add(secondInput)
+
         val distributionCombo = makeComboBoxWith(listOfUsedDistributions)
         distributionCombo.addActionListener {
             if (distributionCombo.selectedIndex == 1)
@@ -82,7 +102,30 @@ class DistributionWindowApp(title: String) : JFrame()
             }
         }
         parametersPanel.add(distributionCombo)
-        parametersPanel.add(makeJButton(textForGoButton))
+
+        val goButton = makeJButton(textForGoButton)
+        goButton.addActionListener {
+            if (checkInputParameters(firstInput.text, secondInput.text))
+            {
+                TODO("Build and add graphics")
+            }
+            else
+            {
+                val message =
+                    JLabel(
+                        "Переданные параметры не могут быть распознаны как вещественные числа. " +
+                                "В качестве разделителя следует использовать точку."
+                    )
+                message.font = usedFont
+                JOptionPane.showMessageDialog(
+                    this,
+                    message,
+                    "Ошибка ввода",
+                    JOptionPane.ERROR_MESSAGE
+                )
+            }
+        }
+        parametersPanel.add(goButton)
 
         this.add(parametersPanel)
     }
@@ -110,14 +153,14 @@ class DistributionWindowApp(title: String) : JFrame()
 
         defaultCloseOperation = EXIT_ON_CLOSE
         setSize(800, 600)
-        layout = GridLayout(3, 1)
+        layout = GridLayout(1, 1)
 
         setLocationRelativeTo(null)
 
         prepareAndPlaceParametersPanel()
 
-        prepareAndPlacePlotDistributionPanel()
-
-        prepareAndPlacePlotDensityPanel()
+//        prepareAndPlacePlotDistributionPanel()
+//
+//        prepareAndPlacePlotDensityPanel()
     }
 }
