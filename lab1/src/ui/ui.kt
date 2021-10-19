@@ -3,8 +3,6 @@ package ui
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartPanel
 import org.jfree.chart.plot.PlotOrientation
-import org.jfree.chart.ui.VerticalAlignment
-import org.jfree.data.xy.XYDataset
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
 import java.awt.*
