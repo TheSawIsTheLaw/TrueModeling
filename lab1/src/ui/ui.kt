@@ -110,7 +110,6 @@ class DistributionWindowApp(title: String) : JFrame()
             val curDistribution = 0.5 * (1 + org.apache.commons.math.special.Erf.erf(
                 (currentX - parameterMu) / sqrt(2 * parameterSigma * parameterSigma)
             ))
-            println(curDistribution)
             val curDensity =
                 (1 / (2 * sqrt(2.0 * PI))) * exp(-((currentX - parameterMu) * (currentX - parameterMu) / (2 * parameterSigma * parameterSigma)))
 
