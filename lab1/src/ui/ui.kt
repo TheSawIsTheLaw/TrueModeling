@@ -5,8 +5,9 @@ import org.jfree.chart.ChartPanel
 import org.jfree.chart.plot.PlotOrientation
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
-import java.awt.*
-import java.lang.NumberFormatException
+import java.awt.Color
+import java.awt.Font
+import java.awt.GridLayout
 import javax.swing.*
 import kotlin.math.PI
 import kotlin.math.exp
@@ -94,10 +95,11 @@ class DistributionWindowApp(title: String) : JFrame()
         distrFrame.isVisible = true
     }
 
+    // Починить распределение
     private fun makeAndAddPlotsForGaussianDistribution(parameterMu: Float, parameterSigma: Float)
     {
-        val startPosition = -10
-        val endPosition = 10
+        val startPosition = parameterMu - 2 - parameterSigma * 4
+        val endPosition = parameterMu + 2 + parameterSigma * 4
         val step = 1e-3
 
         val distributionSeries = XYSeries("Функция распределения")
@@ -109,7 +111,7 @@ class DistributionWindowApp(title: String) : JFrame()
                 (currentX - parameterMu) / sqrt(2 * parameterSigma * parameterSigma)
             ))
             val curDensity =
-                (1 / (2 * sqrt(2.0 * PI))) * exp(-((currentX - parameterMu) * (currentX - parameterMu) / (2 * parameterSigma * parameterSigma)))
+                (1 / (parameterSigma * sqrt(2.0 * PI))) * exp(-(((currentX - parameterMu) * (currentX - parameterMu)) / (2 * parameterSigma * parameterSigma)))
 
             distributionSeries.add(currentX, curDistribution)
             densitySeries.add(currentX, curDensity)
