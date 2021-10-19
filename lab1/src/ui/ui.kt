@@ -10,6 +10,9 @@ import org.jfree.data.xy.XYSeriesCollection
 import java.awt.*
 import java.lang.NumberFormatException
 import javax.swing.*
+import kotlin.math.PI
+import kotlin.math.exp
+import kotlin.math.sqrt
 
 class DistributionWindowApp(title: String) : JFrame()
 {
@@ -101,10 +104,45 @@ class DistributionWindowApp(title: String) : JFrame()
 
         val distributionSeries = XYSeries("Функция распределения")
         val densitySeries = XYSeries("Плотность распределения")
+        var currentX = startPosition.toDouble()
         for (i in 0 until ((endPosition - startPosition) / step).toInt())
         {
-            val curDistribution = 2
+            val curDistribution = 0.5 * (1 + org.apache.commons.math.special.Erf.erf(
+                (currentX - parameterMu) / sqrt(2 * parameterSigma * parameterSigma)
+            ))
+            println(curDistribution)
+            val curDensity =
+                (1 / (2 * sqrt(2.0 * PI))) * exp(-((currentX - parameterMu) * (currentX - parameterMu) / (2 * parameterSigma * parameterSigma)))
+
+            distributionSeries.add(currentX, curDistribution)
+            densitySeries.add(currentX, curDensity)
+
+            currentX += step
         }
+
+        createWindowWithPlot(
+            ChartPanel(
+                ChartFactory.createXYLineChart(
+                    "Функция распределения",
+                    "x",
+                    "F(x)",
+                    XYSeriesCollection(distributionSeries),
+                    PlotOrientation.VERTICAL, true, true, false
+                )
+            ), "Функция распределения"
+        )
+
+        createWindowWithPlot(
+            ChartPanel(
+                ChartFactory.createXYLineChart(
+                    "Функция плотности распределения",
+                    "x",
+                    "f(x)",
+                    XYSeriesCollection(densitySeries),
+                    PlotOrientation.VERTICAL, true, true, false
+                )
+            ), "Функция плотности распределения"
+        )
     }
 
     private fun makeAndAddPlotsForEvenDistribution(parameterA_: Float, parameterB_: Float)
@@ -202,7 +240,7 @@ class DistributionWindowApp(title: String) : JFrame()
                 when (distributionCombo.selectedIndex)
                 {
                     0 -> makeAndAddPlotsForEvenDistribution(firstInput.text.toFloat(), secondInput.text.toFloat())
-                    1 -> TODO()
+                    1 -> makeAndAddPlotsForGaussianDistribution(firstInput.text.toFloat(), secondInput.text.toFloat())
                 }
             }
             else
