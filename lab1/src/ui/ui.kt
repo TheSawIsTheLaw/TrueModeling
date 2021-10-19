@@ -111,7 +111,7 @@ class DistributionWindowApp(title: String) : JFrame()
                 (currentX - parameterMu) / sqrt(2 * parameterSigma * parameterSigma)
             ))
             val curDensity =
-                (1 / (parameterSigma * sqrt(2.0 * PI))) * exp(-(((currentX - parameterMu) * (currentX - parameterMu)) / (2 * parameterSigma * parameterSigma)))
+                (1 / (sqrt(2.0 * PI * parameterSigma * parameterSigma))) * exp(-(((currentX - parameterMu) * (currentX - parameterMu)) / (2 * parameterSigma * parameterSigma)))
 
             distributionSeries.add(currentX, curDistribution)
             densitySeries.add(currentX, curDensity)
