@@ -3,6 +3,7 @@ package ui
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartPanel
 import org.jfree.chart.plot.PlotOrientation
+import org.jfree.chart.ui.VerticalAlignment
 import org.jfree.data.xy.XYDataset
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
@@ -83,6 +84,29 @@ class DistributionWindowApp(title: String) : JFrame()
         return true
     }
 
+    private fun createWindowWithPlot(chartPanel: ChartPanel, name: String)
+    {
+        val distrFrame = JFrame(name)
+//        distrFrame.defaultCloseOperation = EXIT_ON_CLOSE
+        distrFrame.add(chartPanel)
+        distrFrame.pack()
+        distrFrame.isVisible = true
+    }
+
+    private fun makeAndAddPlotsForGaussianDistribution(parameterMu: Float, parameterSigma: Float)
+    {
+        val startPosition = -10
+        val endPosition = 10
+        val step = 1e-3
+
+        val distributionSeries = XYSeries("Функция распределения")
+        val densitySeries = XYSeries("Плотность распределения")
+        for (i in 0 until ((endPosition - startPosition) / step).toInt())
+        {
+            val curDistribution = 2
+        }
+    }
+
     private fun makeAndAddPlotsForEvenDistribution(parameterA_: Float, parameterB_: Float)
     {
         var parameterA = parameterA_
@@ -97,7 +121,7 @@ class DistributionWindowApp(title: String) : JFrame()
 
         val distributionSeries = XYSeries("Функция распределения")
         val densitySeries = XYSeries("Плотность распределения")
-        for (i in 0 until (5 * sizeOfPlate / (3 * stepOnPlate) + 1).toInt())
+        for (i in 0 until (5 * sizeOfPlate / (3 * stepOnPlate)).toInt())
         {
             val curDistr = when
             {
@@ -110,26 +134,36 @@ class DistributionWindowApp(title: String) : JFrame()
             val curDensity = when (currentX)
             {
                 in parameterA..parameterB -> 1 / (parameterB - parameterA)
-                else                      -> 1
+                else                      -> 0
             }
             densitySeries.add(currentX, curDensity)
 
             currentX += stepOnPlate.toFloat()
         }
 
-        ???.add(
-            ChartPanel(ChartFactory.createXYLineChart(
-                "Функция распределения",
-                "x",
-                "F(x)",
-                XYSeriesCollection(distributionSeries),
-                PlotOrientation.VERTICAL, true, true, false)))
-        ???.add(ChartPanel(ChartFactory.createXYLineChart(
-            "Функция плотности распределения",
-            "x",
-            "f(x)",
-            XYSeriesCollection(densitySeries),
-            PlotOrientation.VERTICAL, true, true, false)))
+        createWindowWithPlot(
+            ChartPanel(
+                ChartFactory.createXYLineChart(
+                    "Функция распределения",
+                    "x",
+                    "F(x)",
+                    XYSeriesCollection(distributionSeries),
+                    PlotOrientation.VERTICAL, true, true, false
+                )
+            ), "Функция распределения"
+        )
+
+        createWindowWithPlot(
+            ChartPanel(
+                ChartFactory.createXYLineChart(
+                    "Функция плотности распределения",
+                    "x",
+                    "f(x)",
+                    XYSeriesCollection(densitySeries),
+                    PlotOrientation.VERTICAL, true, true, false
+                )
+            ), "Функция плотности распределения"
+        )
     }
 
     private fun prepareAndPlaceParametersPanel()
@@ -160,7 +194,6 @@ class DistributionWindowApp(title: String) : JFrame()
         }
         parametersPanel.add(distributionCombo)
 
-        val parent = this
         val goButton = makeJButton(textForGoButton)
         // Возможно стоит вынести графики в приваты, а после выполнения листенера подтягивать их в фрейм.
         goButton.addActionListener {
@@ -218,15 +251,11 @@ class DistributionWindowApp(title: String) : JFrame()
         UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel")
 
         defaultCloseOperation = EXIT_ON_CLOSE
-        setSize(800, 600)
-        layout = GridLayout(3, 1)
+        setSize(800, 165)
+        layout = GridLayout(1, 1)
 
         setLocationRelativeTo(null)
 
         prepareAndPlaceParametersPanel()
-
-//        prepareAndPlacePlotDistributionPanel()
-//
-//        prepareAndPlacePlotDensityPanel()
     }
 }
