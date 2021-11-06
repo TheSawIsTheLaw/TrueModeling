@@ -288,8 +288,7 @@ class DistributionWindowApp(title: String) : JFrame()
         try
         {
             UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel")
-        }
-        catch (exc: Exception)
+        } catch (exc: Exception)
         {
             UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel")
         }
