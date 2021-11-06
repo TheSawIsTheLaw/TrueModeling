@@ -45,3 +45,5 @@ lab*/.idea/
 *.MF
 *.iml
 lab*/out/
+lab*/build/
+lab*/.gradle/
