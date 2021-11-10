@@ -49,3 +49,5 @@ lab*/build/
 lab*/.gradle/
 
 lab*/src/build*/
+
+*.user*

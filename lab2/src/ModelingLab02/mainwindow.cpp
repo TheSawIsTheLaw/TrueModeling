@@ -9,18 +9,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->setWindowTitle("Лабораторная работа 2, Якуба, ИУ7-73Б");
 }
 
-MainWindow::~MainWindow()
-{
-    delete ui;
-}
+MainWindow::~MainWindow() { delete ui; }
 
 void MainWindow::resizeIntensityMatrix(int size)
 {
     intensityMatrix.resize(size);
-    for (auto &row : intensityMatrix)
-    {
-        row.resize(size);
-    }
+    for (auto &row : intensityMatrix) { row.resize(size); }
 }
 
 void MainWindow::resizeTableWidget(QTableWidget *tableWidget, int rows, int cols)
@@ -42,10 +36,10 @@ void MainWindow::resizeTableWidget(QTableWidget *tableWidget, int rows, int cols
 
 void MainWindow::on_numberOfStatesSpinBox_textChanged(const QString &arg1)
 {
-    qDebug() << "начинаем";
     int currentStatesNumber = ui->numberOfStatesSpinBox->value();
 
-    resizeTableWidget(ui->intensityMatrixTableWidget, currentStatesNumber, currentStatesNumber);
+    resizeTableWidget(
+        ui->intensityMatrixTableWidget, currentStatesNumber, currentStatesNumber);
     resizeTableWidget(ui->resultTableWidget, currentStatesNumber, 3);
 
     ui->resultTableWidget->setHorizontalHeaderLabels(QStringList() << "Вероятность"
@@ -65,15 +59,10 @@ bool MainWindow::readToIntensityMatrix()
     {
         for (int j = 0; j < numberOfColumns && isValid; j++)
         {
-            try
-            {
-                QString curItem = ui->intensityMatrixTableWidget->item(i, j)->text();
-                intensityMatrix[i][j] = curItem == "" ? 0 : curItem.toDouble();
-            }
-            catch (...)
-            {
+            QString curItem = ui->intensityMatrixTableWidget->item(i, j)->text();
+            intensityMatrix[i][j] = curItem == "" ? 0 : curItem.toDouble(&isValid);
+            if (curItem[0] == "-")
                 isValid = false;
-            }
         }
     }
 
@@ -82,6 +71,12 @@ bool MainWindow::readToIntensityMatrix()
 
 void MainWindow::on_startButton_clicked()
 {
-    readToIntensityMatrix();
+    bool readIsValid = readToIntensityMatrix();
+    if (!readIsValid)
+    {
+        QMessageBox::critical(this, "Ошибка чтения",
+            "В качестве элементов матрицы должны быть предоставлены положительные "
+            "вещественные числа");
+        return;
+    }
 }
-

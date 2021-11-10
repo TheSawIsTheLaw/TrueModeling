@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QTableWidget>
 #include <QStringList>
+#include <QMessageBox>
 
 QT_BEGIN_NAMESPACE
 namespace Ui
