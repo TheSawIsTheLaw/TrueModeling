@@ -47,3 +47,5 @@ lab*/.idea/
 lab*/out/
 lab*/build/
 lab*/.gradle/
+
+lab*/src/build*/
