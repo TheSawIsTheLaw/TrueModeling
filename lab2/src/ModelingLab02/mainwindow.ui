@@ -30,7 +30,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="spinBox">
+         <widget class="QSpinBox" name="numberOfStatesSpinBox">
           <property name="maximum">
            <number>10</number>
           </property>
@@ -66,10 +66,27 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
-       <widget class="QTableWidget" name="intensityMatrixTableWidget"/>
+       <widget class="QTableWidget" name="intensityMatrixTableWidget">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>2</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="lineWidth">
+         <number>2</number>
+        </property>
+       </widget>
       </item>
-      <item>
-       <widget class="QTableWidget" name="resultTableWidget"/>
+      <item alignment="Qt::AlignRight">
+       <widget class="QTableWidget" name="resultTableWidget">
+        <property name="minimumSize">
+         <size>
+          <width>389</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
