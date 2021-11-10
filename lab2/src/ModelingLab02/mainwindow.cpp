@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QtDebug>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -41,6 +42,7 @@ void MainWindow::resizeTableWidget(QTableWidget *tableWidget, int rows, int cols
 
 void MainWindow::on_numberOfStatesSpinBox_textChanged(const QString &arg1)
 {
+    qDebug() << "начинаем";
     int currentStatesNumber = ui->numberOfStatesSpinBox->value();
 
     resizeTableWidget(ui->intensityMatrixTableWidget, currentStatesNumber, currentStatesNumber);
@@ -52,3 +54,34 @@ void MainWindow::on_numberOfStatesSpinBox_textChanged(const QString &arg1)
 
     resizeIntensityMatrix(currentStatesNumber);
 }
+
+bool MainWindow::readToIntensityMatrix()
+{
+    int numberOfColumns = ui->intensityMatrixTableWidget->columnCount();
+    int numberOfRows = ui->intensityMatrixTableWidget->rowCount();
+
+    bool isValid = true;
+    for (int i = 0; i < numberOfRows; i++)
+    {
+        for (int j = 0; j < numberOfColumns && isValid; j++)
+        {
+            try
+            {
+                QString curItem = ui->intensityMatrixTableWidget->item(i, j)->text();
+                intensityMatrix[i][j] = curItem == "" ? 0 : curItem.toDouble();
+            }
+            catch (...)
+            {
+                isValid = false;
+            }
+        }
+    }
+
+    return isValid;
+}
+
+void MainWindow::on_startButton_clicked()
+{
+    readToIntensityMatrix();
+}
+

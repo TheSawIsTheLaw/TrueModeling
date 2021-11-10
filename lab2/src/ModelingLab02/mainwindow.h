@@ -23,7 +23,9 @@ class MainWindow : public QMainWindow
   private slots:
     void on_numberOfStatesSpinBox_textChanged(const QString &arg1);
 
-  private:
+    void on_startButton_clicked();
+
+private:
     Ui::MainWindow *ui;
 
     QVector<QVector<double>> intensityMatrix;
@@ -32,5 +34,6 @@ class MainWindow : public QMainWindow
     void resizeTableWidget(QTableWidget *tableWidget, int rows, int cols);
     void resizeIntensityMatrixTableWidget(int size);
     void resizeResultTableWidget(int size);
+    bool readToIntensityMatrix();
 };
 #endif // MAINWINDOW_H
