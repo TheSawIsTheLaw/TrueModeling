@@ -7,6 +7,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
 
     this->setWindowTitle("Лабораторная работа 2, Якуба, ИУ7-73Б");
+
+    on_numberOfStatesSpinBox_textChanged(QString());
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -43,8 +45,8 @@ void MainWindow::on_numberOfStatesSpinBox_textChanged(const QString &arg1)
     resizeTableWidget(ui->resultTableWidget, currentStatesNumber, 3);
 
     ui->resultTableWidget->setHorizontalHeaderLabels(QStringList() << "Вероятность"
-                                                                   << "t1"
-                                                                   << "t2");
+                                                                   << "t₀"
+                                                                   << "tₙ");
 
     resizeIntensityMatrix(currentStatesNumber);
 }
