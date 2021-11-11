@@ -22,7 +22,7 @@ QVector<QVector<double>> buildSystemOfKolmogorovEquations(
     return result;
 }
 
-QVector<double> delta_p(
+QVector<double> probabilityDerivatives(
     const QVector<QVector<double>> &matrix, const QVector<double> &p, double dt)
 {
     const auto n = matrix.size();
@@ -61,7 +61,7 @@ QVector<double> get_system_times(const QVector<QVector<double>> &intensityMatrix
     for (double t = dt; !end && t < 1e3; t += dt)
     {
         end = true;
-        QVector<double> dp = delta_p(intensityMatrix, p, dt);
+        QVector<double> dp = probabilityDerivatives(intensityMatrix, p, dt);
         for (int i = 0; i < n; i++)
         {
             end = (std::abs(systemSolvation[i] - p[i]) <= eps) && (dp[i] <= eps);
