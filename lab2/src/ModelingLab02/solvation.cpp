@@ -6,12 +6,12 @@ QVector<QVector<double>> build_coeff_matrix(const QVector<QVector<double>> &matr
 {
     const auto n = matrix.size();
     QVector<QVector<double>> result(n, QVector<double>(n + 1));
-    for (int state = 0; state < n - 1; ++state)
+    for (int state = 0; state < n - 1; state++)
     {
-        for (int col = 0; col < n; ++col) { result[state][state] -= matrix[state][col]; }
-        for (int row = 0; row < n; ++row) { result[state][row] += matrix[row][state]; }
+        for (int col = 0; col < n; col++) { result[state][state] -= matrix[state][col]; }
+        for (int row = 0; row < n; row++) { result[state][row] += matrix[row][state]; }
     }
-    for (int state = 0; state < n; ++state) { result[n - 1][state] = 1; }
+    for (int state = 0; state < n; state++) { result[n - 1][state] = 1; }
 
     result[n - 1][n] = 1;
 
@@ -23,10 +23,10 @@ QVector<double> delta_p(
 {
     const auto n = matrix.size();
     QVector<double> dp(n);
-    for (int i = 0; i < n; ++i)
+    for (int i = 0; i < n; i++)
     {
         double curr = 0;
-        for (int j = 0; j < n; ++j)
+        for (int j = 0; j < n; j++)
         {
             if (i == j)
             {
@@ -61,7 +61,7 @@ QVector<double> get_system_times(const QVector<QVector<double>> &matrix,
     {
         end = true;
         auto dp = delta_p(matrix, p, dt);
-        for (size_type i = 0; i < n; ++i)
+        for (size_type i = 0; i < n; i++)
         {
             if (std::abs(result[i] - p[i]) <= eps && dp[i] <= eps)
             {

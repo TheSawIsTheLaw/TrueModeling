@@ -25,9 +25,9 @@ void MainWindow::resizeTableWidget(QTableWidget *tableWidget, int rows, int cols
     tableWidget->setRowCount(rows);
     tableWidget->setColumnCount(cols);
 
-    for (int i = 0; i < rows; ++i)
+    for (int i = 0; i < rows; i++)
     {
-        for (int j = 0; j < cols; ++j)
+        for (int j = 0; j < cols; j++)
         {
             if (!tableWidget->item(i, j))
             {
@@ -89,13 +89,11 @@ void MainWindow::on_startButton_clicked()
     p0_1[0] = 1;
     QVector<double> p0_a(nStates, 1.0 / nStates);
 
-    qDebug() << intensityMatrix;
-    const auto result = solve(intensityMatrix);
-    const auto time_result_1 = get_system_times(intensityMatrix, result, p0_1, 1e-3, 1e-3);
-    const auto time_result_a = get_system_times(intensityMatrix, result, p0_a, 1e-3, 1e-3);
+    QVector<double> result = solve(intensityMatrix);
+    QVector<double> time_result_1 = get_system_times(intensityMatrix, result, p0_1, 1e-3, 1e-3);
+    QVector<double> time_result_a = get_system_times(intensityMatrix, result, p0_a, 1e-3, 1e-3);
 
-    resizeIntensityMatrix(nStates);
-    for (int i = 0; i < nStates; ++i)
+    for (int i = 0; i < nStates; i++)
     {
         ui->resultTableWidget->item(i, 0)->setText(QString::number(result[i]));
         ui->resultTableWidget->item(i, 1)->setText(QString::number(time_result_1[i]));
