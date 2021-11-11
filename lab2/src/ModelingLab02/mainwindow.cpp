@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "solvation.cpp"
 #include "ui_mainwindow.h"
 #include <QtDebug>
 
@@ -80,5 +81,24 @@ void MainWindow::on_startButton_clicked()
             "В качестве элементов матрицы должны быть предоставлены положительные "
             "вещественные числа");
         return;
+    }
+
+    const auto nStates = ui->numberOfStatesSpinBox->value();
+
+    QVector<double> p0_1(nStates);
+    p0_1[0] = 1;
+    QVector<double> p0_a(nStates, 1.0 / nStates);
+
+    qDebug() << intensityMatrix;
+    const auto result = solve(intensityMatrix);
+    const auto time_result_1 = get_system_times(intensityMatrix, result, p0_1, 1e-3, 1e-3);
+    const auto time_result_a = get_system_times(intensityMatrix, result, p0_a, 1e-3, 1e-3);
+
+    resizeIntensityMatrix(nStates);
+    for (int i = 0; i < nStates; ++i)
+    {
+        ui->resultTableWidget->item(i, 0)->setText(QString::number(result[i]));
+        ui->resultTableWidget->item(i, 1)->setText(QString::number(time_result_1[i]));
+        ui->resultTableWidget->item(i, 2)->setText(QString::number(time_result_a[i]));
     }
 }
