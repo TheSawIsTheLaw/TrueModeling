@@ -1,9 +1,9 @@
+#include <QVector>
 #include <algorithm>
 #include <cmath>
 #include <stdexcept>
 
-template <template <typename> typename Container>
-bool is_square_matrix(const Container<Container<double>> &matrix)
+bool is_square_matrix(const QVector<QVector<double>> &matrix)
 {
     for (const auto &row : matrix)
     {
@@ -15,21 +15,19 @@ bool is_square_matrix(const Container<Container<double>> &matrix)
     return true;
 }
 
-template <template <typename> typename Container>
 decltype(auto) max_abs_element_in_column(
-    Container<Container<double>> &matrix, typename Container<double>::size_type col)
+    QVector<QVector<double>> &matrix, typename QVector<double>::size_type col)
 {
     return std::max_element(matrix.begin() + col, matrix.end(),
-        [col](const Container<double> &lhs, const Container<double> &rhs) {
+        [col](const QVector<double> &lhs, const QVector<double> &rhs) {
             return fabs(lhs[col]) < fabs(rhs[col]);
         });
 }
 
-template <template <typename> typename Container>
 void make_zeros(
-    Container<Container<double>> &matrix, typename Container<double>::size_type col)
+    QVector<QVector<double>> &matrix, typename QVector<double>::size_type col)
 {
-    using size_type = typename Container<double>::size_type;
+    using size_type = typename QVector<double>::size_type;
 
     for (size_type i = col + 1; i < matrix.size(); ++i)
     {
@@ -40,8 +38,7 @@ void make_zeros(
     }
 }
 
-template <template <typename> typename Container>
-Container<double> gauss(const Container<Container<double>> &A)
+QVector<double> gauss(const QVector<QVector<double>> &A)
 {
     const auto n = A.size();
 
@@ -50,10 +47,8 @@ Container<double> gauss(const Container<Container<double>> &A)
         throw std::invalid_argument("Inappropriate dimensions");
     }
 
-    using size_type = typename Container<double>::size_type;
-
     auto G = A;
-    for (size_type k = 0; k < n; ++k)
+    for (int k = 0; k < n; ++k)
     {
         auto max_abs_row = max_abs_element_in_column(G, k);
         std::swap(*max_abs_row, G[k]);
@@ -65,14 +60,14 @@ Container<double> gauss(const Container<Container<double>> &A)
         }
     }
 
-    Container<double> X(n);
+    QVector<double> X(n);
     for (int i = static_cast<int>(n) - 1; i >= 0; --i)
     {
-        const auto j = static_cast<size_type>(i);
+        const auto j = static_cast<int>(i);
         X[j] = G[j][n] / G[j][j];
         for (int k = i - 1; k >= 0; --k)
         {
-            const auto q = static_cast<size_type>(k);
+            const auto q = static_cast<int>(k);
             G[q][n] -= G[q][j] * X[j];
         }
     }
