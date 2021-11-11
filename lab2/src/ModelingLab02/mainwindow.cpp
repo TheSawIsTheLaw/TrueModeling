@@ -43,11 +43,10 @@ void MainWindow::on_numberOfStatesSpinBox_textChanged(const QString &arg1)
 
     resizeTableWidget(
         ui->intensityMatrixTableWidget, currentStatesNumber, currentStatesNumber);
-    resizeTableWidget(ui->resultTableWidget, currentStatesNumber, 3);
+    resizeTableWidget(ui->resultTableWidget, currentStatesNumber, 2);
 
     ui->resultTableWidget->setHorizontalHeaderLabels(QStringList() << "Вероятность"
-                                                                   << "t₀"
-                                                                   << "tₙ");
+                                                                   << "T");
 
     resizeIntensityMatrix(currentStatesNumber);
 }
@@ -83,20 +82,17 @@ void MainWindow::on_startButton_clicked()
         return;
     }
 
-    const auto nStates = ui->numberOfStatesSpinBox->value();
+    const auto numberOfStates = ui->numberOfStatesSpinBox->value();
 
-    QVector<double> p0_1(nStates);
-    p0_1[0] = 1;
-    QVector<double> p0_a(nStates, 1.0 / nStates);
+    QVector<double> probability(numberOfStates);
+    probability[0] = 1;
 
-    QVector<double> result = solve(intensityMatrix);
-    QVector<double> time_result_1 = get_system_times(intensityMatrix, result, p0_1, 1e-3, 1e-3);
-    QVector<double> time_result_a = get_system_times(intensityMatrix, result, p0_a, 1e-3, 1e-3);
+    QVector<double> systemSolvation = solve(intensityMatrix);
+    QVector<double> time_result_1 = get_system_times(intensityMatrix, systemSolvation, probability, 1e-3, 1e-3);
 
-    for (int i = 0; i < nStates; i++)
+    for (int i = 0; i < numberOfStates; i++)
     {
-        ui->resultTableWidget->item(i, 0)->setText(QString::number(result[i]));
+        ui->resultTableWidget->item(i, 0)->setText(QString::number(systemSolvation[i]));
         ui->resultTableWidget->item(i, 1)->setText(QString::number(time_result_1[i]));
-        ui->resultTableWidget->item(i, 2)->setText(QString::number(time_result_a[i]));
     }
 }

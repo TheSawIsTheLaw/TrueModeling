@@ -1,15 +1,19 @@
 #include "gaussMethod.cpp"
+#include <QDebug>
 #include <QVector>
 #include <numeric>
 
-QVector<QVector<double>> build_coeff_matrix(const QVector<QVector<double>> &matrix)
+QVector<QVector<double>> buildSystemOfKolmogorovEquations(
+    const QVector<QVector<double>> &intensityMatrix)
 {
-    const auto n = matrix.size();
+    const auto n = intensityMatrix.size();
     QVector<QVector<double>> result(n, QVector<double>(n + 1));
     for (int state = 0; state < n - 1; state++)
     {
-        for (int col = 0; col < n; col++) { result[state][state] -= matrix[state][col]; }
-        for (int row = 0; row < n; row++) { result[state][row] += matrix[row][state]; }
+        for (int col = 0; col < n; col++)
+        { result[state][state] -= intensityMatrix[state][col]; }
+        for (int row = 0; row < n; row++)
+        { result[state][row] += intensityMatrix[row][state]; }
     }
     for (int state = 0; state < n; state++) { result[n - 1][state] = 1; }
 
@@ -28,52 +32,40 @@ QVector<double> delta_p(
         double curr = 0;
         for (int j = 0; j < n; j++)
         {
-            if (i == j)
-            {
-                curr += p[j] * (matrix[i][i] - std::accumulate(matrix[i].begin(),
-                                                   matrix[i].end(), 0.0));
-            }
-            else
-            {
-                curr += p[j] * matrix[j][i];
-            }
+            curr += i != j ? p[j] * matrix[j][i]
+                           : p[j] * (matrix[i][i] - std::accumulate(matrix[i].begin(),
+                                                        matrix[i].end(), 0.0));
         }
         dp[i] = curr * dt;
     }
     return dp;
 }
 
-QVector<double> solve(const QVector<QVector<double>> &matrix)
+QVector<double> solve(const QVector<QVector<double>> &intensityMatrix)
 {
-    return gauss(build_coeff_matrix(matrix));
+    QVector<QVector<double>> systemOfKolmogorovEquations =
+        buildSystemOfKolmogorovEquations(intensityMatrix);
+
+    return gauss(systemOfKolmogorovEquations);
 }
 
-QVector<double> get_system_times(const QVector<QVector<double>> &matrix,
-    const QVector<double> &result, const QVector<double> &p0, double dt, double eps)
+QVector<double> get_system_times(const QVector<QVector<double>> &intensityMatrix,
+    const QVector<double> &systemSolvation, const QVector<double> &p0, double dt,
+    double eps)
 {
-    using size_type = typename QVector<double>::size_type;
-
-    const auto n = matrix.size();
+    const auto n = intensityMatrix.size();
 
     QVector<double> time_result(n);
     QVector<double> p = p0;
-    for (auto [t, end] = std::tuple{dt, false}; !end && t < 1000; t += dt)
+    bool end = false;
+    for (double t = dt; !end && t < 1e3; t += dt)
     {
         end = true;
-        auto dp = delta_p(matrix, p, dt);
-        for (size_type i = 0; i < n; i++)
+        QVector<double> dp = delta_p(intensityMatrix, p, dt);
+        for (int i = 0; i < n; i++)
         {
-            if (std::abs(result[i] - p[i]) <= eps && dp[i] <= eps)
-            {
-                if (time_result[i] == 0.0)
-                {
-                    time_result[i] = t;
-                }
-            }
-            else
-            {
-                end = false;
-            }
+            end = (std::abs(systemSolvation[i] - p[i]) <= eps) && (dp[i] <= eps);
+            !end ?: time_result[i] != 0.0 ?: time_result[i] = t;
             p[i] += dp[i];
         }
     }
