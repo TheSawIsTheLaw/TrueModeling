@@ -81,19 +81,6 @@
         </property>
        </widget>
       </item>
-      <item alignment="Qt::AlignRight">
-       <widget class="QTableWidget" name="resultTableWidget">
-        <property name="minimumSize">
-         <size>
-          <width>389</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="alternatingRowColors">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
      </layout>
     </item>
    </layout>

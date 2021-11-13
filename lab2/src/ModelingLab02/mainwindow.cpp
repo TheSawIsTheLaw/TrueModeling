@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "solvation.cpp"
 #include "ui_mainwindow.h"
-#include <QtDebug>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -25,7 +25,15 @@ void MainWindow::resizeTableWidget(QTableWidget *tableWidget, int rows, int cols
     tableWidget->setRowCount(rows);
     tableWidget->setColumnCount(cols);
 
-    for (int i = 0; i < rows; i++)
+    for (int i = rows - 1; i > rows - 3; i--)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            tableWidget->setItem(i, j, new QTableWidgetItem);
+        }
+    }
+
+    for (int i = 0; i < rows - 2; i++)
     {
         for (int j = 0; j < cols; j++)
         {
@@ -42,11 +50,14 @@ void MainWindow::on_numberOfStatesSpinBox_textChanged(const QString &arg1)
     int currentStatesNumber = ui->numberOfStatesSpinBox->value();
 
     resizeTableWidget(
-        ui->intensityMatrixTableWidget, currentStatesNumber, currentStatesNumber);
-    resizeTableWidget(ui->resultTableWidget, currentStatesNumber, 2);
+        ui->intensityMatrixTableWidget, currentStatesNumber + 2, currentStatesNumber);
 
-    ui->resultTableWidget->setHorizontalHeaderLabels(QStringList() << "Вероятность"
-                                                                   << "T");
+    QStringList listOfHeadersForRows = QStringList();
+    for (int i = 0; i < currentStatesNumber; i++)
+    { listOfHeadersForRows.append(QString::number(i)); }
+    listOfHeadersForRows.append("P");
+    listOfHeadersForRows.append("T");
+    ui->intensityMatrixTableWidget->setVerticalHeaderLabels(listOfHeadersForRows);
 
     resizeIntensityMatrix(currentStatesNumber);
 }
@@ -54,7 +65,7 @@ void MainWindow::on_numberOfStatesSpinBox_textChanged(const QString &arg1)
 bool MainWindow::readToIntensityMatrix()
 {
     int numberOfColumns = ui->intensityMatrixTableWidget->columnCount();
-    int numberOfRows = ui->intensityMatrixTableWidget->rowCount();
+    int numberOfRows = ui->intensityMatrixTableWidget->rowCount() - 2;
 
     bool isValid = true;
     for (int i = 0; i < numberOfRows; i++)
@@ -81,18 +92,23 @@ void MainWindow::on_startButton_clicked()
             "вещественные числа");
         return;
     }
+    qDebug() << "1";
 
     const auto numberOfStates = ui->numberOfStatesSpinBox->value();
+    qDebug() << "2";
 
     QVector<double> probability(numberOfStates);
     probability[0] = 1;
 
     QVector<double> systemSolvation = solve(intensityMatrix);
-    QVector<double> time_result_1 = get_system_times(intensityMatrix, systemSolvation, probability, 1e-3, 1e-3);
+    QVector<double> time_result_1 =
+        get_system_times(intensityMatrix, systemSolvation, probability, 1e-3, 1e-3);
 
     for (int i = 0; i < numberOfStates; i++)
     {
-        ui->resultTableWidget->item(i, 0)->setText(QString::number(systemSolvation[i]));
-        ui->resultTableWidget->item(i, 1)->setText(QString::number(time_result_1[i]));
+        ui->intensityMatrixTableWidget->item(numberOfStates, i)
+            ->setText(QString::number(systemSolvation[i]));
+        ui->intensityMatrixTableWidget->item(numberOfStates + 1, i)
+            ->setText(QString::number(time_result_1[i]));
     }
 }
