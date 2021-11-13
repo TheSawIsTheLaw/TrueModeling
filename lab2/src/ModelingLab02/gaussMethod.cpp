@@ -23,22 +23,26 @@ void columnZeroing(QVector<QVector<double>> &matrix, int col)
 
 QVector<double> gauss(const QVector<QVector<double>> &systemToSolve)
 {
-    int n = systemToSolve.size();
+    int systemSize = systemToSolve.size();
 
     QVector<QVector<double>> triangleSystem = systemToSolve;
-    for (int k = 0; k < n; k++)
+    for (int k = 0; k < systemSize; k++)
     {
         QVector<double> *changedRowToLift = getRowWithMaxAbsInColumn(triangleSystem, k);
         std::swap(*changedRowToLift, triangleSystem[k]);
         columnZeroing(triangleSystem, k);
     }
 
-    QVector<double> fundamentalDecisionSystem(n);
-    for (int i = n - 1; i >= 0; i--)
+    QVector<double> fundamentalDecisionSystem(systemSize);
+    for (int i = systemSize - 1; i >= 0; i--)
     {
-        fundamentalDecisionSystem[i] = triangleSystem[i][n] / triangleSystem[i][i];
+        fundamentalDecisionSystem[i] =
+            triangleSystem[i][systemSize] / triangleSystem[i][i];
         for (int k = i - 1; k >= 0; k--)
-        { triangleSystem[k][n] -= triangleSystem[k][i] * fundamentalDecisionSystem[i]; }
+        {
+            triangleSystem[k][systemSize] -=
+                triangleSystem[k][i] * fundamentalDecisionSystem[i];
+        }
     }
 
     return fundamentalDecisionSystem;

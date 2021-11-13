@@ -99,14 +99,14 @@ void MainWindow::on_startButton_clicked()
     probability[0] = 1;
 
     QVector<double> systemSolvation = solve(intensityMatrix);
-    QVector<double> time_result_1 =
-        get_system_times(intensityMatrix, systemSolvation, probability, 1e-3, 1e-3);
+    QVector<double> time =
+        determineTime(intensityMatrix, systemSolvation, probability, 1e-3, 1e-3);
 
     for (int i = 0; i < numberOfStates; i++)
     {
         ui->intensityMatrixTableWidget->item(numberOfStates, i)
             ->setText(QString::number(systemSolvation[i]));
         ui->intensityMatrixTableWidget->item(numberOfStates + 1, i)
-            ->setText(QString::number(time_result_1[i]));
+            ->setText(QString::number(time[i]));
     }
 }

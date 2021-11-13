@@ -6,39 +6,49 @@
 QVector<QVector<double>> buildSystemOfKolmogorovEquations(
     const QVector<QVector<double>> &intensityMatrix)
 {
-    const auto n = intensityMatrix.size();
-    QVector<QVector<double>> result(n, QVector<double>(n + 1));
-    for (int state = 0; state < n - 1; state++)
-    {
-        for (int col = 0; col < n; col++)
-        { result[state][state] -= intensityMatrix[state][col]; }
-        for (int row = 0; row < n; row++)
-        { result[state][row] += intensityMatrix[row][state]; }
-    }
-    for (int state = 0; state < n; state++) { result[n - 1][state] = 1; }
+    int numberOfStates = intensityMatrix.size();
 
-    result[n - 1][n] = 1;
+    QVector<QVector<double>> result(numberOfStates, QVector<double>(numberOfStates + 1));
+    for (int curState = 0; curState < numberOfStates - 1; curState++)
+    {
+        for (int col = 0; col < numberOfStates; col++)
+        { result[curState][curState] -= intensityMatrix[curState][col]; }
+
+        for (int row = 0; row < numberOfStates; row++)
+        { result[curState][row] += intensityMatrix[row][curState]; }
+    }
+
+    for (int state = 0; state < numberOfStates; state++)
+    { result[numberOfStates - 1][state] = 1; }
+
+    result[numberOfStates - 1][numberOfStates] = 1;
 
     return result;
 }
 
-QVector<double> probabilityDerivatives(
-    const QVector<QVector<double>> &matrix, const QVector<double> &p, double dt)
+QVector<double> probabilityDerivatives(const QVector<QVector<double>> &intensityMetrix,
+    const QVector<double> &probabilities, double timeDelta)
 {
-    const auto n = matrix.size();
-    QVector<double> dp(n);
-    for (int i = 0; i < n; i++)
+    int numberOfStates = intensityMetrix.size();
+
+    QVector<double> probabilityDerivatives(numberOfStates);
+    for (int i = 0; i < numberOfStates; i++)
     {
-        double curr = 0;
-        for (int j = 0; j < n; j++)
+        double sumForProbability = 0;
+        for (int j = 0; j < numberOfStates; j++)
         {
-            curr += i != j ? p[j] * matrix[j][i]
-                           : p[j] * (matrix[i][i] - std::accumulate(matrix[i].begin(),
-                                                        matrix[i].end(), 0.0));
+            sumForProbability +=
+                i != j
+                    ? probabilities[j] * intensityMetrix[j][i]
+                    : probabilities[j] * (intensityMetrix[i][i] -
+                                             std::accumulate(intensityMetrix[i].begin(),
+                                                 intensityMetrix[i].end(), 0.0));
         }
-        dp[i] = curr * dt;
+
+        probabilityDerivatives[i] = sumForProbability * timeDelta;
     }
-    return dp;
+
+    return probabilityDerivatives;
 }
 
 QVector<double> solve(const QVector<QVector<double>> &intensityMatrix)
@@ -49,26 +59,33 @@ QVector<double> solve(const QVector<QVector<double>> &intensityMatrix)
     return gauss(systemOfKolmogorovEquations);
 }
 
-QVector<double> get_system_times(const QVector<QVector<double>> &intensityMatrix,
-    const QVector<double> &systemSolvation, const QVector<double> &p0, double dt,
-    double eps)
+QVector<double> determineTime(const QVector<QVector<double>> &intensityMatrix,
+    const QVector<double> &systemSolvation, const QVector<double> &probabilityList,
+    double timeDelta, double eps)
 {
-    const auto n = intensityMatrix.size();
+    int numberOfStates = intensityMatrix.size();
 
-    QVector<double> time_result(n);
-    QVector<double> p = p0;
-    bool end = false;
-    for (double t = dt; !end && t < 1e3; t += dt)
+    QVector<double> listOfTimes(numberOfStates);
+    QVector<double> probabilities = probabilityList;
+
+    bool endOfSearchCondition = false;
+    for (double curTime = timeDelta; !endOfSearchCondition && curTime < 1e3;
+         curTime += timeDelta)
     {
-        end = true;
-        QVector<double> dp = probabilityDerivatives(intensityMatrix, p, dt);
-        for (int i = 0; i < n; i++)
+        endOfSearchCondition = true;
+        QVector<double> probabilityDerivative =
+            probabilityDerivatives(intensityMatrix, probabilities, timeDelta);
+        for (int i = 0; i < numberOfStates; i++)
         {
-            end = (std::abs(systemSolvation[i] - p[i]) <= eps) && (dp[i] <= eps);
-            !end ?: time_result[i] != 0.0 ?: time_result[i] = t;
-            p[i] += dp[i];
+            endOfSearchCondition =
+                (std::abs(systemSolvation[i] - probabilities[i]) <= eps) &&
+                (probabilityDerivative[i] <= eps);
+
+            !endOfSearchCondition ?: listOfTimes[i] != 0.0 ?: listOfTimes[i] = curTime;
+
+            probabilities[i] += probabilityDerivative[i];
         }
     }
 
-    return time_result;
+    return listOfTimes;
 }
