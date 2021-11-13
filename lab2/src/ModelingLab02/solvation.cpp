@@ -26,10 +26,10 @@ QVector<QVector<double>> buildSystemOfKolmogorovEquations(
     return result;
 }
 
-QVector<double> probabilityDerivatives(const QVector<QVector<double>> &intensityMetrix,
+QVector<double> probabilityDerivatives(const QVector<QVector<double>> &intensityMatrix,
     const QVector<double> &probabilities, double timeDelta)
 {
-    int numberOfStates = intensityMetrix.size();
+    int numberOfStates = intensityMatrix.size();
 
     QVector<double> probabilityDerivatives(numberOfStates);
     for (int i = 0; i < numberOfStates; i++)
@@ -38,11 +38,11 @@ QVector<double> probabilityDerivatives(const QVector<QVector<double>> &intensity
         for (int j = 0; j < numberOfStates; j++)
         {
             sumForProbability +=
-                i != j
-                    ? probabilities[j] * intensityMetrix[j][i]
-                    : probabilities[j] * (intensityMetrix[i][i] -
-                                             std::accumulate(intensityMetrix[i].begin(),
-                                                 intensityMetrix[i].end(), 0.0));
+                probabilities[j] *
+                ((i != j) ? intensityMatrix[j][i]
+                          : (intensityMatrix[i][i] -
+                                std::accumulate(intensityMatrix[i].begin(),
+                                    intensityMatrix[i].end(), 0.0)));
         }
 
         probabilityDerivatives[i] = sumForProbability * timeDelta;
@@ -78,10 +78,12 @@ QVector<double> determineTime(const QVector<QVector<double>> &intensityMatrix,
         for (int i = 0; i < numberOfStates; i++)
         {
             endOfSearchCondition =
-                (std::abs(systemSolvation[i] - probabilities[i]) <= eps) &&
-                (probabilityDerivative[i] <= eps);
-
-            !endOfSearchCondition ?: listOfTimes[i] != 0.0 ?: listOfTimes[i] = curTime;
+                std::abs(systemSolvation[i] - probabilities[i]) <= eps &&
+                probabilityDerivative[i] <= eps;
+            if (endOfSearchCondition && listOfTimes[i] == 0.0)
+            {
+                listOfTimes[i] = curTime;
+            }
 
             probabilities[i] += probabilityDerivative[i];
         }
