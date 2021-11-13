@@ -53,7 +53,7 @@ void MainWindow::on_numberOfStatesSpinBox_textChanged(const QString &arg1)
         ui->intensityMatrixTableWidget, currentStatesNumber + 2, currentStatesNumber);
 
     QStringList listOfHeadersForRows = QStringList();
-    for (int i = 0; i < currentStatesNumber; i++)
+    for (int i = 1; i <= currentStatesNumber; i++)
     { listOfHeadersForRows.append(QString::number(i)); }
     listOfHeadersForRows.append("P");
     listOfHeadersForRows.append("T");
