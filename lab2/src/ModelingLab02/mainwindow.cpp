@@ -100,7 +100,7 @@ void MainWindow::on_startButton_clicked()
 
     QVector<double> systemSolvation = solve(intensityMatrix);
     QVector<double> time =
-        determineTime(intensityMatrix, systemSolvation, probability, 1e-3, 1e-3);
+        determineTime(intensityMatrix, systemSolvation, probability, 1e-3, 1e-2);
 
     for (int i = 0; i < numberOfStates; i++)
     {

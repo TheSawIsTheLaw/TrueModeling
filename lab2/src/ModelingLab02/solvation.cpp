@@ -26,6 +26,14 @@ QVector<QVector<double>> buildSystemOfKolmogorovEquations(
     return result;
 }
 
+QVector<double> solve(const QVector<QVector<double>> &intensityMatrix)
+{
+    QVector<QVector<double>> systemOfKolmogorovEquations =
+        buildSystemOfKolmogorovEquations(intensityMatrix);
+
+    return gauss(systemOfKolmogorovEquations);
+}
+
 QVector<double> probabilityDerivatives(const QVector<QVector<double>> &intensityMatrix,
     const QVector<double> &probabilities, double timeDelta)
 {
@@ -49,14 +57,6 @@ QVector<double> probabilityDerivatives(const QVector<QVector<double>> &intensity
     }
 
     return probabilityDerivatives;
-}
-
-QVector<double> solve(const QVector<QVector<double>> &intensityMatrix)
-{
-    QVector<QVector<double>> systemOfKolmogorovEquations =
-        buildSystemOfKolmogorovEquations(intensityMatrix);
-
-    return gauss(systemOfKolmogorovEquations);
 }
 
 QVector<double> determineTime(const QVector<QVector<double>> &intensityMatrix,
