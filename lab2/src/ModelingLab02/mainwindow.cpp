@@ -92,10 +92,8 @@ void MainWindow::on_startButton_clicked()
             "вещественные числа");
         return;
     }
-    qDebug() << "1";
 
     const auto numberOfStates = ui->numberOfStatesSpinBox->value();
-    qDebug() << "2";
 
     QVector<double> probability(numberOfStates);
     probability[0] = 1;
