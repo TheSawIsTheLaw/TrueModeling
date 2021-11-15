@@ -69,6 +69,4 @@ void MainWindow::on_generateButton_clicked()
     ui->tablePValOneDigit->setText(QString::number(tester.getPValueOfSequence(generatedByTROneDigit)));
     ui->tablePValTwoDigit->setText(QString::number(tester.getPValueOfSequence(generatedByTRTwoDigit)));
     ui->tablePValThreeDigit->setText(QString::number(tester.getPValueOfSequence(generatedByTRThreeDigit)));
-
-    qDebug() << tester.getPValueOfSequence(generatedByLCROneDigit);
 }
