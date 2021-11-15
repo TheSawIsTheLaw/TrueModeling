@@ -12,12 +12,14 @@ SOURCES += \
     frequencytest.cpp \
     linearcongruentrandomizer.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    tablerandomizer.cpp
 
 HEADERS += \
     frequencytest.hpp \
     linearcongruentrandomizer.hpp \
-    mainwindow.hpp
+    mainwindow.hpp \
+    tablerandomizer.hpp
 
 FORMS += \
     mainwindow.ui

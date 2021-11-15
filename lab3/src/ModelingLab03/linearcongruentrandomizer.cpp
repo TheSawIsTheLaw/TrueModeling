@@ -21,13 +21,13 @@ QVector<long> LinearCongruentRandomizer::createRandomSequence(
         curElement = curElement * 1103515245 + 12345;
         numberToAppend = ((unsigned int)(curElement / 65536) % (RAND_MAX + 1)) % requiredDigitsDivider;
 
-        if (numberToAppend < minAppendValue)
+        if (numberToAppend >= minAppendValue)
         {
-            i--;
+            sequence.append(numberToAppend);
         }
         else
         {
-            sequence.append(numberToAppend);
+            i--;
         }
     }
 
