@@ -14,7 +14,7 @@ QVector<long> LinearCongruentRandomizer::createRandomSequence(
     QVector<long> sequence = QVector<long>();
 
     long requiredDigitsDivider = pow(10, numberOfRequiredDigits);
-    long minAppendValue = requiredDigitsDivider / 10;
+    long minAppendValue = requiredDigitsDivider / 10 - 1;
     long numberToAppend;
     for (int i = 0; i < numberOfElements; i++)
     {

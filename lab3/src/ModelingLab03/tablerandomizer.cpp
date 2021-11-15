@@ -1,6 +1,7 @@
 #include "tablerandomizer.hpp"
 
-TableRandomizer::TableRandomizer() {}
+TableRandomizer::TableRandomizer() { fileToRead.open(pathToTable, std::ios_base::in); }
+TableRandomizer::~TableRandomizer() { fileToRead.close(); }
 
 QVector<long> TableRandomizer::getRandomSequence(
     int numberOfRequiredDigits, int numberOfElements)
@@ -10,16 +11,15 @@ QVector<long> TableRandomizer::getRandomSequence(
         return QVector<long>();
     }
 
-    std::fstream fileToRead;
     QVector<long> sequence = QVector<long>();
 
     long requiredDigitsDivider = pow(10, numberOfRequiredDigits);
-    long minAppendValue = requiredDigitsDivider / 10;
+    long minAppendValue = requiredDigitsDivider / 10 - 1;
     long numberToAppend;
     int addedElements = 0;
 
-    for (fileToRead.open(pathToTable, std::ios_base::in);
-         fileToRead >> numberToAppend, addedElements < numberOfElements; addedElements++)
+    for (; fileToRead >> numberToAppend, addedElements < numberOfElements;
+         addedElements++)
     {
         numberToAppend = numberToAppend % requiredDigitsDivider;
         if (numberToAppend >= minAppendValue)

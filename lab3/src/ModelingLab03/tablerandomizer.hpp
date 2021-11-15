@@ -9,14 +9,16 @@
 class TableRandomizer
 {
 public:
-    std::string pathToTable = "numbersFromAMRDWND.txt";
 
     TableRandomizer();
+    ~TableRandomizer();
 
     QVector<long> getRandomSequence(int numberOfRequiredDigits, int numberOfElements);
 
 private:
+    std::string pathToTable = "numbersFromAMRDWND.txt";
     size_t curElementIndex = 0;
+    std::fstream fileToRead;
 };
 
 #endif // TABLERANDOMIZER_HPP

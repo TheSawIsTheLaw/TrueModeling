@@ -13,6 +13,19 @@ QVector<std::bitset<LONG_SIZE_IN_BITS>> FrequencyTest::prepareSequenceBits(
     return outSeq;
 }
 
+int FrequencyTest::findNumberOfSignificantDigits(QVector<std::bitset<LONG_SIZE_IN_BITS>> vectorOfLongsBits)
+{
+    int currentMaxOfSigDigs = 0;
+    for (size_t i = 0; i < vectorOfLongsBits.size(); i++)
+    {
+        size_t j = LONG_SIZE_IN_BITS - 1;
+        for (; vectorOfLongsBits[i][j] == 0 && j > 0; j--) {}
+        if (j > currentMaxOfSigDigs) currentMaxOfSigDigs = j + 1;
+    }
+
+    return currentMaxOfSigDigs;
+}
+
 #include <QDebug>
 double FrequencyTest::getPValueOfSequence(QVector<long> sequence)
 {
@@ -23,22 +36,25 @@ double FrequencyTest::getPValueOfSequence(QVector<long> sequence)
     for (int i = 0; i < vectorOfLongsBits.size(); i++)
     { qDebug() << vectorOfLongsBits[i].to_string().c_str(); }
 
-    double sum = 0.0;
-    size_t numberOfUsedBits = 0;
+    int numberOfSigDigs = findNumberOfSignificantDigits(vectorOfLongsBits);
+    qDebug() << "number of sigs: " << numberOfSigDigs;
+    long long sum = 0;
     for (int i = 0; i < vectorOfLongsBits.size(); i++)
     {
-        size_t j = LONG_SIZE_IN_BITS - 1;
-        for (; vectorOfLongsBits[i][j] == 0 && j > 0; j--) {}
+        size_t j = numberOfSigDigs - 1;
 
-        numberOfUsedBits = j + 1;
         for (; j > 0; j--)
         {
             sum += 2 * vectorOfLongsBits[i][j] - 1;
         }
     }
     qDebug() << "sum" << sum;
+    qDebug() << "sequence of" << sequence[0];
 
-    double sObs = fabs(sum) / sqrt(numberOfUsedBits);
+    size_t numberOfUsedBits = vectorOfLongsBits.size() * numberOfSigDigs;
+    double sObs = abs(sum) / sqrt(numberOfUsedBits);
+
+    qDebug() << "sObs" << sObs;
 
     // If the computed P-value is < 0.01, then conclude that the sequence is non-random
     return erfc(sObs / sqrtOfTwo);
