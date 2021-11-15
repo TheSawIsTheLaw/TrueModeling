@@ -2,7 +2,8 @@
 
 LinearCongruentRandomizer::LinearCongruentRandomizer() {}
 
-QVector<long> LinearCongruentRandomizer::createRandomSubsequence(
+#include <QDebug>
+QVector<long> LinearCongruentRandomizer::createRandomSequence(
     int numberOfRequiredDigits, int numberOfElements)
 {
     if (numberOfElements < 1 || numberOfRequiredDigits < 1)
@@ -10,7 +11,7 @@ QVector<long> LinearCongruentRandomizer::createRandomSubsequence(
         return QVector<long>();
     }
 
-    QVector<long> subsequence = QVector<long>();
+    QVector<long> sequence = QVector<long>();
 
     long requiredDigitsDivider = pow(10, numberOfRequiredDigits);
     long minAppendValue = requiredDigitsDivider / 10;
@@ -26,11 +27,12 @@ QVector<long> LinearCongruentRandomizer::createRandomSubsequence(
         }
         else
         {
-            subsequence.append(numberToAppend);
+            sequence.append(numberToAppend);
         }
     }
 
-    return subsequence;
+    qDebug() << "Generated seq: " << sequence;
+    return sequence;
 }
 
 void LinearCongruentRandomizer::setSeed(long seed)

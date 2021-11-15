@@ -9,7 +9,7 @@ class LinearCongruentRandomizer
 public:
     LinearCongruentRandomizer();
 
-    QVector<long int> createRandomSubsequence(int numberOfRequiredDigits, int numberOfElements);
+    QVector<long int> createRandomSequence(int numberOfRequiredDigits, int numberOfElements);
     void setSeed(long seed);
 
 private:
