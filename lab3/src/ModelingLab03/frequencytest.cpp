@@ -1,4 +1,5 @@
 #include "frequencytest.hpp"
+#include "cephes.h"
 
 FrequencyTest::FrequencyTest() {}
 
@@ -38,24 +39,26 @@ double FrequencyTest::getPValueOfSequence(QVector<long> sequence)
 
     int numberOfSigDigs = findNumberOfSignificantDigits(vectorOfLongsBits);
     qDebug() << "number of sigs: " << numberOfSigDigs;
-    int numberOfUsedBits = 0;
-    long long sum = 0;
-    for (int i = 0; i < vectorOfLongsBits.size(); i++)
+
+    int n = numberOfSigDigs * vectorOfLongsBits.size();
+    int N = n / numberOfSigDigs;
+
+    double sum = 0;
+
+    double blockSum;
+    for (int i = 0; i < N; i++)
     {
-        for (int j = numberOfSigDigs - 1; j >= 0; numberOfUsedBits++, j--)
+        blockSum = 0;
+        for (int j = numberOfSigDigs - 1; j >= 0; j--)
         {
-            sum += 2 * vectorOfLongsBits[i][j] - 1;
+            blockSum += vectorOfLongsBits[i][j];
         }
+        double pi = (double) blockSum / (double) numberOfSigDigs;
+        double v = pi - 0.5;
+        sum += v * v;
     }
-    qDebug() << "sum" << sum;
-    qDebug() << "number of used bits" << numberOfUsedBits;
-    qDebug() << "sequence of" << sequence[0];
 
-//    size_t numberOfUsedBits = vectorOfLongsBits.size() * numberOfSigDigs;
-    double sObs = abs(sum) / sqrt(numberOfUsedBits);
+    double chiSquared = 4 * numberOfSigDigs * sum;
 
-    qDebug() << "sObs" << sObs;
-
-    // If the computed P-value is < 0.01, then conclude that the sequence is non-random
-    return erfc(sObs / sqrtOfTwo);
+    return cephes_igamc(N / 2, chiSquared / 2);
 }
