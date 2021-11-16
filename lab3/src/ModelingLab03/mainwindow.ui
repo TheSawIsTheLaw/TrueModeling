@@ -118,7 +118,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>P-value частотного побитового теста, используещегося в NIST Static tests:</string>
+         <string>P-value блочного побитового теста, используещегося в NIST Static tests:</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -126,6 +126,13 @@
        </widget>
       </item>
      </layout>
+    </item>
+    <item row="1" column="0">
+     <widget class="QPushButton" name="handTestingButton">
+      <property name="text">
+       <string>Ручное тестирование</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>

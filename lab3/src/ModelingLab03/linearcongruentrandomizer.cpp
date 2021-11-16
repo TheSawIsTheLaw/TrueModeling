@@ -31,7 +31,6 @@ QVector<long> LinearCongruentRandomizer::createRandomSequence(
         }
     }
 
-//    qDebug() << "Generated seq: " << sequence;
     return sequence;
 }
 

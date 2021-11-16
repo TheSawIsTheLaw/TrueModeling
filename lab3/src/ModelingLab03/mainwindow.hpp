@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QTableWidget>
 
+#include "handtestwindow.hpp"
+
 #define NUMBER_OF_GENERATED_VALUES 1000
 
 QT_BEGIN_NAMESPACE
@@ -23,6 +25,8 @@ public:
 
 private slots:
     void on_generateButton_clicked();
+
+    void on_handTestingButton_clicked();
 
 private:
     void fullTableWithValues(QTableWidget *table, QVector<long> oneDigitValues,

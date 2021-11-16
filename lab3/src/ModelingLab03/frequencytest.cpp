@@ -41,12 +41,7 @@ double FrequencyTest::getPValueOfSequence(QVector<long> sequence)
     QVector<std::bitset<LONG_SIZE_IN_BITS>> vectorOfLongsBits =
         prepareSequenceBits(sequence);
 
-    //    qDebug() << "Sequence in bits:";
-    //    for (int i = 0; i < vectorOfLongsBits.size(); i++)
-    //    { qDebug() << vectorOfLongsBits[i].to_string().c_str(); }
-
     int lengthOfEachBlock = findNumberOfSignificantDigits(sequence[0]);
-    qDebug() << "number of sigs: " << lengthOfEachBlock;
 
     int numberOfAnalyzedBits = lengthOfEachBlock * vectorOfLongsBits.size();
     int numberOfBlocks = numberOfAnalyzedBits / lengthOfEachBlock;

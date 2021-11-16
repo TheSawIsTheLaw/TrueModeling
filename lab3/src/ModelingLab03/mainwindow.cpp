@@ -70,3 +70,9 @@ void MainWindow::on_generateButton_clicked()
     ui->tablePValTwoDigit->setText(QString::number(tester.getPValueOfSequence(generatedByTRTwoDigit)));
     ui->tablePValThreeDigit->setText(QString::number(tester.getPValueOfSequence(generatedByTRThreeDigit)));
 }
+
+void MainWindow::on_handTestingButton_clicked()
+{
+    handTestWindow().exec();
+}
+

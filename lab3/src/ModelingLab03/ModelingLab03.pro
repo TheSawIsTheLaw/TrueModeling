@@ -11,6 +11,7 @@ CONFIG += c++11
 SOURCES += \
     cephes.cpp \
     frequencytest.cpp \
+    handtestwindow.cpp \
     linearcongruentrandomizer.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -19,11 +20,13 @@ SOURCES += \
 HEADERS += \
     cephes.h \
     frequencytest.hpp \
+    handtestwindow.hpp \
     linearcongruentrandomizer.hpp \
     mainwindow.hpp \
     tablerandomizer.hpp
 
 FORMS += \
+    handtestwindow.ui \
     mainwindow.ui
 
 # Default rules for deployment.
