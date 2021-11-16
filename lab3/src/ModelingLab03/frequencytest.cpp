@@ -41,9 +41,9 @@ double FrequencyTest::getPValueOfSequence(QVector<long> sequence)
     QVector<std::bitset<LONG_SIZE_IN_BITS>> vectorOfLongsBits =
         prepareSequenceBits(sequence);
 
-//    qDebug() << "Sequence in bits:";
-//    for (int i = 0; i < vectorOfLongsBits.size(); i++)
-//    { qDebug() << vectorOfLongsBits[i].to_string().c_str(); }
+    //    qDebug() << "Sequence in bits:";
+    //    for (int i = 0; i < vectorOfLongsBits.size(); i++)
+    //    { qDebug() << vectorOfLongsBits[i].to_string().c_str(); }
 
     int lengthOfEachBlock = findNumberOfSignificantDigits(sequence[0]);
     qDebug() << "number of sigs: " << lengthOfEachBlock;
@@ -57,10 +57,9 @@ double FrequencyTest::getPValueOfSequence(QVector<long> sequence)
     for (int i = 0; i < numberOfBlocks; i++)
     {
         blockSum = 0;
-        for (int j = lengthOfEachBlock - 1; j >= 0; j--)
-        {
-            blockSum += vectorOfLongsBits[i][j];
-        }
+        for (int j = lengthOfEachBlock - 1; j >= 0;
+             blockSum += vectorOfLongsBits[i][j], j--)
+        {}
 
         elementOfChiSquaredStat = blockSum / lengthOfEachBlock - 0.5;
         sumForStatisic += elementOfChiSquaredStat * elementOfChiSquaredStat;
