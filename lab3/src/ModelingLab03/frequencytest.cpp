@@ -15,17 +15,25 @@ QVector<std::bitset<LONG_SIZE_IN_BITS>> FrequencyTest::prepareSequenceBits(
 }
 
 #include <QDebug>
-int FrequencyTest::findNumberOfSignificantDigits(QVector<std::bitset<LONG_SIZE_IN_BITS>> vectorOfLongsBits)
+int FrequencyTest::findNumberOfSignificantDigits(long number)
 {
-    int currentMaxOfSigDigs = 0;
-    for (int i = 0; i < vectorOfLongsBits.size(); i++)
+    int numberOfDigits = std::log10(number) + 1;
+
+    int significantDigits = LONG_SIZE_IN_BITS;
+    switch (numberOfDigits)
     {
-        int j = LONG_SIZE_IN_BITS - 1;
-        for (; vectorOfLongsBits[i][j] == 0 && j >= 0; j--) {}
-        if (j > currentMaxOfSigDigs) currentMaxOfSigDigs = j;
+    case 1:
+        significantDigits = 4;
+        break;
+    case 2:
+        significantDigits = 7;
+        break;
+    case 3:
+        significantDigits = 10;
+        break;
     }
 
-    return currentMaxOfSigDigs + 1;
+    return significantDigits;
 }
 
 double FrequencyTest::getPValueOfSequence(QVector<long> sequence)
@@ -37,28 +45,28 @@ double FrequencyTest::getPValueOfSequence(QVector<long> sequence)
 //    for (int i = 0; i < vectorOfLongsBits.size(); i++)
 //    { qDebug() << vectorOfLongsBits[i].to_string().c_str(); }
 
-    int numberOfSigDigs = findNumberOfSignificantDigits(vectorOfLongsBits);
-    qDebug() << "number of sigs: " << numberOfSigDigs;
+    int lengthOfEachBlock = findNumberOfSignificantDigits(sequence[0]);
+    qDebug() << "number of sigs: " << lengthOfEachBlock;
 
-    int n = numberOfSigDigs * vectorOfLongsBits.size();
-    int N = n / numberOfSigDigs;
+    int numberOfAnalyzedBits = lengthOfEachBlock * vectorOfLongsBits.size();
+    int numberOfBlocks = numberOfAnalyzedBits / lengthOfEachBlock;
 
-    double sum = 0;
+    double sumForStatisic = 0;
 
-    double blockSum;
-    for (int i = 0; i < N; i++)
+    double blockSum, elementOfChiSquaredStat;
+    for (int i = 0; i < numberOfBlocks; i++)
     {
         blockSum = 0;
-        for (int j = numberOfSigDigs - 1; j >= 0; j--)
+        for (int j = lengthOfEachBlock - 1; j >= 0; j--)
         {
             blockSum += vectorOfLongsBits[i][j];
         }
-        double pi = (double) blockSum / (double) numberOfSigDigs;
-        double v = pi - 0.5;
-        sum += v * v;
+
+        elementOfChiSquaredStat = blockSum / lengthOfEachBlock - 0.5;
+        sumForStatisic += elementOfChiSquaredStat * elementOfChiSquaredStat;
     }
 
-    double chiSquared = 4 * numberOfSigDigs * sum;
+    double chiSquared = 4 * lengthOfEachBlock * sumForStatisic;
 
-    return cephes_igamc(N / 2, chiSquared / 2);
+    return incompleteGammaFunction(numberOfBlocks / 2, chiSquared / 2);
 }

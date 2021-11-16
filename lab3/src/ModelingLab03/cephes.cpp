@@ -15,7 +15,7 @@ static double biginv =  2.22044604925031308085e-16;
 int sgngam = 0;
 
 double
-cephes_igamc(double a, double x)
+incompleteGammaFunction(double a, double x)
 {
     double ans, ax, c, yc, r, t, y, z;
     double pk, pkm1, pkm2, qk, qkm1, qkm2;
@@ -82,7 +82,7 @@ cephes_igam(double a, double x)
         return 0.0;
 
     if ( (x > 1.0) && (x > a ) )
-        return 1.e0 - cephes_igamc(a,x);
+        return 1.e0 - incompleteGammaFunction(a,x);
 
     /* Compute  x**a * exp(-x) / gamma(a)  */
     ax = a * log(x) - x - cephes_lgam(a);

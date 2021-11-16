@@ -17,7 +17,7 @@ public:
     const double sqrtOfTwo = 1.41421356237309504880;
 
 private:
-    int findNumberOfSignificantDigits(QVector<std::bitset<LONG_SIZE_IN_BITS>>);
+    int findNumberOfSignificantDigits(long);
     QVector<std::bitset<LONG_SIZE_IN_BITS>> prepareSequenceBits(QVector<long> sequence);
 };
 
