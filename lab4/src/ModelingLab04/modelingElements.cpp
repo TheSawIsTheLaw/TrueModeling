@@ -3,14 +3,14 @@
 double equalDistributionRandomValue(double aParameter, double bParameter)
 {
     static thread_local std::default_random_engine generator;
-    static std::uniform_real_distribution<double> distribution(aParameter, bParameter);
+    std::uniform_real_distribution<double> distribution(aParameter, bParameter);
     return distribution(generator);
 }
 
 double gaussDistributionRandomValue(double muParameter, double sigmaParameter)
 {
     static thread_local std::default_random_engine generator;
-    static std::normal_distribution<double> distribution(muParameter, sigmaParameter);
+    std::normal_distribution<double> distribution(muParameter, sigmaParameter);
     return distribution(generator);
 }
 

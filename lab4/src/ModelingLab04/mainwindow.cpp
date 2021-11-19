@@ -42,7 +42,6 @@ QPair<double, double> MainWindow::simulateWithoutInverseConnectionEventMethod()
     return Simulator(processor, generator).simulateUsingEventMethod(numberOfRequests);
 }
 
-#include <QDebug>
 void MainWindow::on_makeModelingButton_clicked()
 {
     aParameter = ui->aParameterSpinBox->value();
@@ -53,5 +52,19 @@ void MainWindow::on_makeModelingButton_clicked()
     numberOfRequests = ui->numberOfRequestsSpinBox->value();
     probabilityOfReturn = ui->returnProbabilitySpinBox->value();
 
-    qDebug() << simulateWithInverseConnectionDeltaTMethod();
+    QPair<double, double> withoutInverseDeltaT = simulateWithoutInverseConnectionDeltaTMethod();
+    QPair<double, double> withInverseDeltaT = simulateWithInverseConnectionDeltaTMethod();
+
+    QPair<double, double> withoutInverseEvent = simulateWithoutInverseConnectionEventMethod();
+    QPair<double, double> withInverseEvent = simulateWithInverseConnectionEventMethod();
+
+    ui->withoutInverseConnectionDeltaTAnswerLabel->setText(QString::number(withoutInverseDeltaT.second));
+
+    ui->inverseConnectionDeltaTReturnedRequestsAnswerLabel->setText(QString::number(withInverseDeltaT.first));
+    ui->inverseConnectionDeltaTMaxQueueAnswerLabel->setText(QString::number(withInverseDeltaT.second));
+
+    ui->withoutInverseConnectionEventMaxQueueAnswerLabel->setText(QString::number(withoutInverseEvent.second));
+
+    ui->inverseConnectionEventReturnedAnswerLabel->setText(QString::number(withInverseEvent.first));
+    ui->inverseConnectionEventMaxQueueAnswerLabel->setText(QString::number(withInverseEvent.second));
 }

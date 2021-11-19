@@ -191,14 +191,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="inverseConncetionDeltaTReturnedRequestsLabel">
+         <widget class="QLabel" name="inverseConnectionDeltaTReturnedRequestsLabel">
           <property name="text">
            <string>Количество вновь поступивших заявок:</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="inverseConncetionDeltaTReturnedRequestsAnswerLabel">
+         <widget class="QLabel" name="inverseConnectionDeltaTReturnedRequestsAnswerLabel">
           <property name="text">
            <string/>
           </property>
