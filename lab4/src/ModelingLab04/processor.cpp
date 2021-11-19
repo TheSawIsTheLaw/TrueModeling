@@ -1,6 +1,9 @@
 #include "processor.hpp"
 
-Processor::Processor(size_t maxOfQueueSize_) { maxOfQueueSize = maxOfQueueSize_; }
+Processor::Processor(double probabilityOfReturnToQueue_)
+{
+    probabilityOfReturnToQueue = probabilityOfReturnToQueue_;
+}
 
 void Processor::processRequest()
 {
@@ -8,17 +11,21 @@ void Processor::processRequest()
     {
         return;
     }
+
+    currentNumberOfRequestsInQueue--;
+    if (equalDistributionRandomValue(0, 1) < probabilityOfReturnToQueue)
+    {
+        numberOfReturnedRequests++;
+        getRequest();
+    }
 }
 
 void Processor::getRequest()
 {
-    if (currentNumberOfRequestsInQueue != maxOfQueueSize)
-    {
-        currentNumberOfRequestsInQueue++;
+    currentNumberOfRequestsInQueue++;
 
-        if (currentNumberOfRequestsInQueue > detectedMaxOfRequestsInQueue)
-        {
-            detectedMaxOfRequestsInQueue = currentNumberOfRequestsInQueue;
-        }
+    if (currentNumberOfRequestsInQueue > detectedMaxOfRequestsInQueue)
+    {
+        detectedMaxOfRequestsInQueue = currentNumberOfRequestsInQueue;
     }
 }

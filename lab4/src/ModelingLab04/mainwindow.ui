@@ -113,9 +113,9 @@
     <item row="6" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
-       <widget class="QLabel" name="queueSizeLabel">
+       <widget class="QLabel" name="numberOfRequestsLabel">
         <property name="text">
-         <string>Ёмкость очереди:</string>
+         <string>Количество заявок:</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -123,7 +123,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="queueSizeSpinBox">
+       <widget class="QSpinBox" name="numberOfRequestsSpinBox">
         <property name="minimum">
          <number>1</number>
         </property>
@@ -168,7 +168,7 @@
         <item>
          <widget class="QLabel" name="withoutInverseConnectionDeltaTLabel">
           <property name="text">
-           <string>Максимальная длина очереди без потерянных сообщений:</string>
+           <string>Достигнутая максимальная длина очереди:</string>
           </property>
          </widget>
         </item>
@@ -207,7 +207,7 @@
         <item>
          <widget class="QLabel" name="inverseConnectionDeltaTmaxQueueLabel">
           <property name="text">
-           <string>Макс. дл. оч. без пот. сообщ.:</string>
+           <string>Макс. длина очереди:</string>
           </property>
          </widget>
         </item>
@@ -368,7 +368,7 @@
         <item>
          <widget class="QLabel" name="inverseConnectionEventMaxQueueLabel">
           <property name="text">
-           <string>Макс. дл. оч. без пот. сообщ.:</string>
+           <string>Макс. длина очереди:</string>
           </property>
          </widget>
         </item>
