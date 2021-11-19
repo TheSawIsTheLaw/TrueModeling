@@ -6,13 +6,14 @@
 class RequestsGenerator
 {
 public:
+    RequestsGenerator();
     RequestsGenerator(double muParameter_, double sigmaParameter_);
 
     double getNextTimeOfRequestGenerated();
 
 private:
-    double muParameter;
-    double sigmaParameter;
+    double muParameter = 0;
+    double sigmaParameter = 1;
 };
 
 #endif // REQUESTSGENERATOR_HPP
