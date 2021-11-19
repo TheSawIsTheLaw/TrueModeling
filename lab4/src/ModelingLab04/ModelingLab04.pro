@@ -10,10 +10,16 @@ CONFIG += c++11
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    processor.cpp \
+    requestsgenerator.cpp \
+    simulator.cpp
 
 HEADERS += \
-    mainwindow.hpp
+    mainwindow.hpp \
+    processor.hpp \
+    requestsgenerator.hpp \
+    simulator.hpp
 
 FORMS += \
     mainwindow.ui
