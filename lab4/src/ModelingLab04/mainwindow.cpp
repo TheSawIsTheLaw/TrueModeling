@@ -45,13 +45,13 @@ QPair<double, double> MainWindow::simulateWithoutInverseConnectionEventMethod()
 #include <QDebug>
 void MainWindow::on_makeModelingButton_clicked()
 {
-    aParameter = ui->aParameterSpinBox->text().toDouble();
-    bParameter = ui->bParameterSpinBox->text().toDouble();
-    muParameter = ui->muParameterSpinBox->text().toDouble();
-    sigmaParameter = ui->sigmaParameterSpinBox->text().toDouble();
+    aParameter = ui->aParameterSpinBox->value();
+    bParameter = ui->bParameterSpinBox->value();
+    muParameter = ui->muParameterSpinBox->value();
+    sigmaParameter = ui->sigmaParameterSpinBox->value();
 
-    numberOfRequests = ui->numberOfRequestsSpinBox->text().toULong();
-    probabilityOfReturn = ui->returnProbabilitySpinBox->text().toDouble();
+    numberOfRequests = ui->numberOfRequestsSpinBox->value();
+    probabilityOfReturn = ui->returnProbabilitySpinBox->value();
 
     qDebug() << simulateWithInverseConnectionDeltaTMethod();
 }
