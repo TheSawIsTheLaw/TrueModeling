@@ -20,10 +20,10 @@ QPair<double, double> Simulator::simulateUsingDeltaTMethod(size_t numberOfReques
     for (double currentTime = 0; numberOfSentRequests < numberOfRequests;
          currentTime += 1e-2)
     {
-//        qDebug() << processor.numberOfProcessedRequests << numberOfRequests;
-//        qDebug() << "Current time" << currentTime;
-//        qDebug() << "Time of generation" << timeOfGenerationOfRequest;
-//        qDebug() << "Time of processing" << timeOfProcessing;
+        //        qDebug() << processor.numberOfProcessedRequests << numberOfRequests;
+        //        qDebug() << "Current time" << currentTime;
+        //        qDebug() << "Time of generation" << timeOfGenerationOfRequest;
+        //        qDebug() << "Time of processing" << timeOfProcessing;
         if (timeOfGenerationOfRequest <= currentTime)
         {
             numberOfSentRequests++;
@@ -37,17 +37,24 @@ QPair<double, double> Simulator::simulateUsingDeltaTMethod(size_t numberOfReques
             (processor.currentNumberOfRequestsInQueue > 0)
                 ? timeOfProcessing += processor.getNextTimeOfRequestProcessed()
                 : timeOfProcessing = timeOfGenerationOfRequest +
-                             processor.getNextTimeOfRequestProcessed();
+                                     processor.getNextTimeOfRequestProcessed();
         }
     }
 
-    return QPair<double, double>(processor.numberOfReturnedRequests, processor.detectedMaxOfRequestsInQueue);
+    while (processor.currentNumberOfRequestsInQueue > 0)
+    {
+        processor.processRequest();
+    }
+
+    return QPair<double, double>(
+        processor.numberOfReturnedRequests, processor.detectedMaxOfRequestsInQueue);
 }
 
 QPair<double, double> Simulator::simulateUsingEventMethod(size_t numberOfRequests)
 {
     double timeOfGenerationOfRequest = requestGenerator.getNextTimeOfRequestGenerated();
-    double timeOfProcessing = timeOfGenerationOfRequest + processor.getNextTimeOfRequestProcessed();
+    double timeOfProcessing =
+        timeOfGenerationOfRequest + processor.getNextTimeOfRequestProcessed();
 
     size_t numberOfSentRequests = 0;
     while (numberOfSentRequests < numberOfRequests)
@@ -69,5 +76,11 @@ QPair<double, double> Simulator::simulateUsingEventMethod(size_t numberOfRequest
         }
     }
 
-    return QPair<double, double>(processor.numberOfReturnedRequests, processor.detectedMaxOfRequestsInQueue);
+    while (processor.currentNumberOfRequestsInQueue > 0)
+    {
+        processor.processRequest();
+    }
+
+    return QPair<double, double>(
+        processor.numberOfReturnedRequests, processor.detectedMaxOfRequestsInQueue);
 }

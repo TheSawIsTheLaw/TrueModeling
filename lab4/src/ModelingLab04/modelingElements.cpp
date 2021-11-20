@@ -2,14 +2,14 @@
 
 double equalDistributionRandomValue(double aParameter, double bParameter)
 {
-    static thread_local std::default_random_engine generator;
+    static std::mt19937 generator(std::random_device{}());
     std::uniform_real_distribution<double> distribution(aParameter, bParameter);
     return distribution(generator);
 }
 
 double gaussDistributionRandomValue(double muParameter, double sigmaParameter)
 {
-    static thread_local std::default_random_engine generator;
+    static std::mt19937 generator(std::random_device{}());
     std::normal_distribution<double> distribution(muParameter, sigmaParameter);
     return distribution(generator);
 }
@@ -24,6 +24,7 @@ Processor::Processor(
     sigmaParameter = sigmaParameter_;
 }
 
+#include <QDebug>
 void Processor::processRequest()
 {
     if (currentNumberOfRequestsInQueue == 0)
@@ -33,7 +34,7 @@ void Processor::processRequest()
 
     currentNumberOfRequestsInQueue--;
     numberOfProcessedRequests++;
-    if (equalDistributionRandomValue(0, 1) < probabilityOfReturnToQueue)
+    if (equalDistributionRandomValue(0, 1) <= probabilityOfReturnToQueue)
     {
         numberOfReturnedRequests++;
         getRequest();
