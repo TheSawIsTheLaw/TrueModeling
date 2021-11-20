@@ -8,7 +8,6 @@ Simulator::Simulator(Processor processor_, RequestsGenerator requestGenerator_)
     requestGenerator = requestGenerator_;
 }
 
-#include <QDebug>
 QPair<double, double> Simulator::simulateUsingDeltaTMethod(size_t numberOfRequests)
 {
     double timeOfGeneration = requestGenerator.getNextTimeOfRequestGenerated();

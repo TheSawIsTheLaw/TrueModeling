@@ -24,7 +24,6 @@ Processor::Processor(
     sigmaParameter = sigmaParameter_;
 }
 
-#include <QDebug>
 void Processor::processRequest()
 {
     if (currentNumberOfRequestsInQueue == 0)
