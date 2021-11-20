@@ -11,32 +11,29 @@ Simulator::Simulator(Processor processor_, RequestsGenerator requestGenerator_)
 #include <QDebug>
 QPair<double, double> Simulator::simulateUsingDeltaTMethod(size_t numberOfRequests)
 {
-    double timeOfGenerationOfRequest = requestGenerator.getNextTimeOfRequestGenerated();
+    double timeOfGeneration = requestGenerator.getNextTimeOfRequestGenerated();
     double timeOfProcessing =
-        timeOfGenerationOfRequest + processor.getNextTimeOfRequestProcessed();
+        timeOfGeneration + processor.getNextTimeOfRequestProcessed();
 
     size_t numberOfSentRequests = 0;
-    // Можно попробовать уменьшить deltaT
     for (double currentTime = 0; numberOfSentRequests < numberOfRequests;
-         currentTime += 1e-2)
+         currentTime += 1e-3)
     {
-        //        qDebug() << processor.numberOfProcessedRequests << numberOfRequests;
-        //        qDebug() << "Current time" << currentTime;
-        //        qDebug() << "Time of generation" << timeOfGenerationOfRequest;
-        //        qDebug() << "Time of processing" << timeOfProcessing;
-        if (timeOfGenerationOfRequest <= currentTime)
+        while (timeOfGeneration <= currentTime)
         {
             numberOfSentRequests++;
             processor.getRequest();
-            timeOfGenerationOfRequest += requestGenerator.getNextTimeOfRequestGenerated();
+
+            timeOfGeneration += requestGenerator.getNextTimeOfRequestGenerated();
         }
 
-        if (timeOfProcessing <= currentTime)
+        while (timeOfProcessing <= currentTime)
         {
             processor.processRequest();
+
             (processor.currentNumberOfRequestsInQueue > 0)
                 ? timeOfProcessing += processor.getNextTimeOfRequestProcessed()
-                : timeOfProcessing = timeOfGenerationOfRequest +
+                : timeOfProcessing = timeOfGeneration +
                                      processor.getNextTimeOfRequestProcessed();
         }
     }
@@ -52,26 +49,27 @@ QPair<double, double> Simulator::simulateUsingDeltaTMethod(size_t numberOfReques
 
 QPair<double, double> Simulator::simulateUsingEventMethod(size_t numberOfRequests)
 {
-    double timeOfGenerationOfRequest = requestGenerator.getNextTimeOfRequestGenerated();
+    double timeOfGeneration = requestGenerator.getNextTimeOfRequestGenerated();
     double timeOfProcessing =
-        timeOfGenerationOfRequest + processor.getNextTimeOfRequestProcessed();
+        timeOfGeneration + processor.getNextTimeOfRequestProcessed();
 
     size_t numberOfSentRequests = 0;
     while (numberOfSentRequests < numberOfRequests)
     {
-        if (timeOfGenerationOfRequest <= timeOfProcessing)
+        while (timeOfGeneration <= timeOfProcessing)
         {
             numberOfSentRequests++;
             processor.getRequest();
-            timeOfGenerationOfRequest += requestGenerator.getNextTimeOfRequestGenerated();
+
+            timeOfGeneration += requestGenerator.getNextTimeOfRequestGenerated();
         }
 
-        if (timeOfGenerationOfRequest >= timeOfProcessing)
+        while (timeOfGeneration >= timeOfProcessing)
         {
             processor.processRequest();
             (processor.currentNumberOfRequestsInQueue > 0)
                 ? timeOfProcessing += processor.getNextTimeOfRequestProcessed()
-                : timeOfProcessing = timeOfGenerationOfRequest +
+                : timeOfProcessing = timeOfGeneration +
                                      processor.getNextTimeOfRequestProcessed();
         }
     }

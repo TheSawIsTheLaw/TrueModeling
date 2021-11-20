@@ -30,7 +30,6 @@ public:
     double getNextTimeOfRequestProcessed();
 
     size_t detectedMaxOfRequestsInQueue = 0;
-    size_t numberOfProcessedRequests = 0;
 
     size_t currentNumberOfRequestsInQueue = 0;
     size_t numberOfReturnedRequests = 0;
@@ -38,7 +37,7 @@ public:
     double probabilityOfReturnToQueue;
 
 private:
-    double muParameter = 0;
+    double muParameter = 1;
     double sigmaParameter = 1;
 };
 

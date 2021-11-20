@@ -33,8 +33,7 @@ void Processor::processRequest()
     }
 
     currentNumberOfRequestsInQueue--;
-    numberOfProcessedRequests++;
-    if (equalDistributionRandomValue(0, 1) <= probabilityOfReturnToQueue)
+    if (equalDistributionRandomValue(0, 1) < probabilityOfReturnToQueue)
     {
         numberOfReturnedRequests++;
         getRequest();
