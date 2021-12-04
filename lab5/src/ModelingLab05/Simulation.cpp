@@ -17,7 +17,7 @@ class Processor
 public:
     virtual ~Processor() {}
 
-    virtual bool receive_request() = 0;
+    virtual bool getRequest() = 0;
 };
 
 class RequestGenerator
@@ -25,34 +25,27 @@ class RequestGenerator
 public:
     using Generator = std::function<double()>;
 
-    RequestGenerator(Generator generator)
-    : generator_(generator)
-    , receivers_()
-    , return_receiver_(nullptr)
-    , n_generated_requests_(0)
-    , next_event_time(0.0)
+    RequestGenerator(Generator generator_)
+    : numberOfGeneratedRequests(0)
+    , returnReceiver(nullptr)
+    , generator(generator_)
+    , receivers()
+    , timeOfNextEvent(0.0)
     {
     }
 
     virtual ~RequestGenerator() {}
 
-    int n_generated_requests() const { return n_generated_requests_; }
+    void subscribeReceiver(Processor *receiver) { receivers.push_back(receiver); }
 
-    void add_receiver(Processor *receiver) { receivers_.push_back(receiver); }
+    double getNextTime() const { return generator(); }
 
-    void set_return_receiver(Processor *return_receiver)
+    Processor *sendRequest()
     {
-        return_receiver_ = return_receiver;
-    }
-
-    double generate_time() const { return generator_(); }
-
-    Processor *emit_request()
-    {
-        ++n_generated_requests_;
-        if (receivers_.size() == 3)
+        numberOfGeneratedRequests++;
+        if (receivers.size() == 3)
         {
-            Processor *receiver = receivers_[0];
+            Processor *receiver = receivers[0];
 
             double currentSum = 0;
             double chooseRandom = getUniformReal(0, 1);
@@ -64,12 +57,12 @@ public:
                 currentSum += pValuesToSendTo[i];
                 if (chooseRandom < currentSum)
                 {
-                    receiver = receivers_[i];
+                    receiver = receivers[i];
                     break;
                 }
             }
 
-            if (receiver->receive_request())
+            if (receiver->getRequest())
             {
                 qDebug() << "Receive";
                 return receiver;
@@ -79,38 +72,40 @@ public:
         }
         else
         {
-            for (auto &&receiver : receivers_)
+            for (auto &&receiver : receivers)
             {
-                if (receiver->receive_request())
+                if (receiver->getRequest())
                 {
                     return receiver;
                 }
             }
         }
-        if (receivers_.size() == 0)
+        if (receivers.size() == 0)
             qDebug() << "It's null";
         return nullptr;
     }
 
-    Processor *return_request()
+    Processor *returnRequestToSubscriber()
     {
-        if (!return_receiver_)
+        if (!returnReceiver)
         {
             qDebug() << "Return receiver is not defined!";
             return nullptr;
         }
-        return_receiver_->receive_request();
-        return return_receiver_;
+        returnReceiver->getRequest();
+        return returnReceiver;
     }
 
+public:
+    int numberOfGeneratedRequests;
+    Processor *returnReceiver;
+
 private:
-    Generator generator_;
-    std::vector<Processor *> receivers_;
-    Processor *return_receiver_;
-    int n_generated_requests_;
+    Generator generator;
+    std::vector<Processor *> receivers;
 
 public:
-    double next_event_time;
+    double timeOfNextEvent;
     std::vector<double> pValuesToSendTo;
 };
 
@@ -119,68 +114,67 @@ class RequestProcessor : public RequestGenerator, public Processor
 public:
     using Generator = RequestGenerator::Generator;
 
-    RequestProcessor(Generator generator, int max_queue_size = 0, double p_return = 0.0)
+    RequestProcessor(
+        Generator generator, int maxOfQueue_ = 0, double probabilityOfReturn_ = 0.0)
     : RequestGenerator(generator)
     , Processor()
-    , n_queued_requests_(0)
-    , max_queue_size_(max_queue_size)
-    , n_processed_requests_(0)
-    , n_dropped_requests_(0)
-    , n_return_(0)
-    , p_return_(p_return)
+    , numberOfRequestsInQueue(0)
+    , numberOfProcessedRequests(0)
+    , numberOfSkippedRequests(0)
+    , maxOfQueue(maxOfQueue_)
+    , numberOfReturns(0)
+    , probabilityOfReturn(probabilityOfReturn_)
     {
     }
 
     ~RequestProcessor() override {}
 
-    int n_queued_requests() const { return n_queued_requests_; }
-    int n_processed_requests() const { return n_processed_requests_; }
-    int n_dropped_requests() const { return n_dropped_requests_; }
-
     void process()
     {
-        if (n_queued_requests_ > 0)
+        if (numberOfRequestsInQueue > 0)
         {
-            ++n_processed_requests_;
-            --n_queued_requests_;
-            emit_request();
+            numberOfProcessedRequests++;
+            numberOfRequestsInQueue--;
+            sendRequest();
 
-            if (getUniformReal(0, 1) < p_return_)
+            if (getUniformReal(0, 1) < probabilityOfReturn)
             {
-                ++n_return_;
-                return_request();
+                numberOfReturns++;
+                returnRequestToSubscriber();
             }
         }
-        next_event_time = n_queued_requests_ ? currentTime + generate_time() : 0.0;
+        timeOfNextEvent = numberOfRequestsInQueue ? currentTime + getNextTime() : 0.0;
     }
 
-    bool receive_request() override
+    bool getRequest() override
     {
-        const auto cond = max_queue_size_ == 0 || n_queued_requests_ < max_queue_size_;
+        const auto cond = maxOfQueue == 0 || numberOfRequestsInQueue < maxOfQueue;
         if (cond)
         {
-            ++n_queued_requests_;
-            next_event_time = n_queued_requests_ ? currentTime + generate_time() : 0.0;
+            numberOfRequestsInQueue++;
+            timeOfNextEvent = numberOfRequestsInQueue ? currentTime + getNextTime() : 0.0;
         }
         else
         {
-            ++n_dropped_requests_;
+            numberOfSkippedRequests++;
         }
         return cond;
     }
 
+public:
+    int numberOfRequestsInQueue;
+    int numberOfProcessedRequests;
+    int numberOfSkippedRequests;
+
 private:
-    int n_queued_requests_;
-    int max_queue_size_;
-    int n_processed_requests_;
-    int n_dropped_requests_;
-    int n_return_;
-    double p_return_;
+    int maxOfQueue;
+    int numberOfReturns;
+    double probabilityOfReturn;
 };
 
 Results doSimulate(const SimulationParameters &parameters)
 {
-    RequestGenerator client_generator([=]() {
+    RequestGenerator generatorOfClients([=]() {
         return getUniformReal(parameters.client.timeOfCome - parameters.client.timeDelta,
             parameters.client.timeOfCome + parameters.client.timeDelta);
     });
@@ -219,38 +213,38 @@ Results doSimulate(const SimulationParameters &parameters)
         parameters.moneytalksWindow.maxQueueSize,
         parameters.client.probabilityOfReturnToMainQueue);
 
-    client_generator.add_receiver(&terminal);
-    terminal.add_receiver(&sendWindow);
-    terminal.add_receiver(&getWindow);
-    terminal.add_receiver(&moneytalksWindow);
-    sendWindow.set_return_receiver(&terminal);
-    getWindow.set_return_receiver(&terminal);
-    moneytalksWindow.set_return_receiver(&terminal);
+    generatorOfClients.subscribeReceiver(&terminal);
+    terminal.subscribeReceiver(&sendWindow);
+    terminal.subscribeReceiver(&getWindow);
+    terminal.subscribeReceiver(&moneytalksWindow);
+    sendWindow.returnReceiver = &terminal;
+    getWindow.returnReceiver = &terminal;
+    moneytalksWindow.returnReceiver = &terminal;
 
     const std::array<RequestGenerator *, 5> devices{
-        &client_generator, &terminal, &sendWindow, &getWindow, &moneytalksWindow};
+        &generatorOfClients, &terminal, &sendWindow, &getWindow, &moneytalksWindow};
 
-    client_generator.next_event_time = client_generator.generate_time();
-    terminal.next_event_time =
-        client_generator.next_event_time + terminal.generate_time();
-    while (client_generator.n_generated_requests() < parameters.client.amount)
+    generatorOfClients.timeOfNextEvent = generatorOfClients.getNextTime();
+    terminal.timeOfNextEvent =
+        generatorOfClients.timeOfNextEvent + terminal.getNextTime();
+    while (generatorOfClients.numberOfGeneratedRequests < parameters.client.amount)
     {
-        qDebug() << "In terminal: " << terminal.n_queued_requests();
-        qDebug() << "In first window: " << sendWindow.n_queued_requests();
-        qDebug() << "In second window: " << getWindow.n_queued_requests();
-        qDebug() << "In third window: " << moneytalksWindow.n_queued_requests();
-        currentTime = client_generator.next_event_time;
+        qDebug() << "In terminal: " << terminal.numberOfRequestsInQueue;
+        qDebug() << "In first window: " << sendWindow.numberOfRequestsInQueue;
+        qDebug() << "In second window: " << getWindow.numberOfRequestsInQueue;
+        qDebug() << "In third window: " << moneytalksWindow.numberOfRequestsInQueue;
+        currentTime = generatorOfClients.timeOfNextEvent;
         for (auto &&device : devices)
         {
-            if (device->next_event_time != 0 && device->next_event_time < currentTime)
+            if (device->timeOfNextEvent != 0 && device->timeOfNextEvent < currentTime)
             {
-                currentTime = device->next_event_time;
+                currentTime = device->timeOfNextEvent;
             }
         }
 
         for (auto &&device : devices)
         {
-            if (currentTime == device->next_event_time)
+            if (currentTime == device->timeOfNextEvent)
             {
                 RequestProcessor *processor = dynamic_cast<RequestProcessor *>(device);
                 if (processor)
@@ -259,34 +253,36 @@ Results doSimulate(const SimulationParameters &parameters)
                 }
                 else
                 {
-                    client_generator.emit_request();
-                    client_generator.next_event_time =
-                        currentTime + client_generator.generate_time();
+                    generatorOfClients.sendRequest();
+                    generatorOfClients.timeOfNextEvent =
+                        currentTime + generatorOfClients.getNextTime();
                 }
             }
         }
     }
 
-    while (terminal.n_queued_requests() > 0 || sendWindow.n_queued_requests() > 0 ||
-           getWindow.n_queued_requests() > 0 || moneytalksWindow.n_queued_requests() > 0)
+    while (terminal.numberOfRequestsInQueue > 0 ||
+           sendWindow.numberOfRequestsInQueue > 0 ||
+           getWindow.numberOfRequestsInQueue > 0 ||
+           moneytalksWindow.numberOfRequestsInQueue > 0)
     {
-        qDebug() << "In terminal: " << terminal.n_queued_requests();
-        qDebug() << "In first window: " << sendWindow.n_queued_requests();
-        qDebug() << "In second window: " << getWindow.n_queued_requests();
-        qDebug() << "In third window: " << moneytalksWindow.n_queued_requests();
+        qDebug() << "In terminal: " << terminal.numberOfRequestsInQueue;
+        qDebug() << "In first window: " << sendWindow.numberOfRequestsInQueue;
+        qDebug() << "In second window: " << getWindow.numberOfRequestsInQueue;
+        qDebug() << "In third window: " << moneytalksWindow.numberOfRequestsInQueue;
         currentTime = std::numeric_limits<double>::max();
         for (size_t i = 1; i < devices.size(); i++)
         {
-            if (devices[i]->next_event_time != 0 &&
-                devices[i]->next_event_time < currentTime)
+            if (devices[i]->timeOfNextEvent != 0 &&
+                devices[i]->timeOfNextEvent < currentTime)
             {
-                currentTime = devices[i]->next_event_time;
+                currentTime = devices[i]->timeOfNextEvent;
             }
         }
 
         for (size_t i = 1; i < devices.size(); i++)
         {
-            if (currentTime == devices[i]->next_event_time)
+            if (currentTime == devices[i]->timeOfNextEvent)
             {
                 dynamic_cast<RequestProcessor *>(devices[i])->process();
             }
@@ -294,11 +290,12 @@ Results doSimulate(const SimulationParameters &parameters)
     }
 
     const auto res = [](const RequestProcessor &processor) {
-        const auto n_dropped_requests = processor.n_dropped_requests();
-        const auto n_processed_requests = processor.n_processed_requests();
-        const auto p_dropped_requests = static_cast<double>(n_dropped_requests) /
-                                        (n_dropped_requests + n_processed_requests);
-        return Results::Element{n_dropped_requests, p_dropped_requests};
+        const auto numberOfSkippedRequests = processor.numberOfSkippedRequests;
+        const auto numberOfProcessedRequests = processor.numberOfProcessedRequests;
+        const auto probabilityOfRequestToBeSkipped =
+            static_cast<double>(numberOfSkippedRequests) /
+            (numberOfSkippedRequests + numberOfProcessedRequests);
+        return Results::Element{numberOfSkippedRequests, probabilityOfRequestToBeSkipped};
     };
 
     return {res(terminal), res(sendWindow), res(getWindow), res(moneytalksWindow)};
