@@ -6,7 +6,7 @@ struct SimulationParameters
     {
         double timeOfCome, timeDelta;
         int amount;
-        double probForSendWindow, probForGetWindow, probForMoneytalksWindow;
+        double probForSendWindow, probForGetWindow, probForMoneytalksWindow, probabilityOfReturnToMainQueue;
     } client;
 
     struct Terminal
@@ -17,6 +17,7 @@ struct SimulationParameters
     struct Window
     {
         double timeOfService, timeDelta;
+        int maxQueueSize;
     } sendWindow, getWindow, moneytalksWindow;
 };
 
