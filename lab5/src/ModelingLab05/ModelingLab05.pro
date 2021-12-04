@@ -13,7 +13,9 @@ SOURCES += \
     mainwindow.cpp
 
 HEADERS += \
-    mainwindow.hpp
+    Simulation.hpp \
+    mainwindow.hpp \
+    random.hpp
 
 FORMS += \
     mainwindow.ui
