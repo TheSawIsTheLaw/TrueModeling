@@ -51,7 +51,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="spinBox">
+           <widget class="QSpinBox" name="NumberOfClientsSpinBox">
             <property name="minimum">
              <number>1</number>
             </property>
@@ -78,7 +78,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="spinBox_2">
+           <widget class="QSpinBox" name="nextClientIntervalSpinBox">
             <property name="minimum">
              <number>1</number>
             </property>
@@ -98,7 +98,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="spinBox_3">
+           <widget class="QSpinBox" name="nextClientIntervalPluxMinusSpinBox">
             <property name="minimum">
              <number>1</number>
             </property>
@@ -150,7 +150,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="doubleSpinBox">
+           <widget class="QDoubleSpinBox" name="probabilityForSendWindowSpinBox">
             <property name="minimum">
              <double>0.010000000000000</double>
             </property>
@@ -176,7 +176,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+         <widget class="QDoubleSpinBox" name="probabilityForGetWindowSpinBox">
           <property name="minimum">
            <double>0.010000000000000</double>
           </property>
@@ -200,7 +200,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
+         <widget class="QDoubleSpinBox" name="probabilityOfMoneytalksSpinBox">
           <property name="minimum">
            <double>0.010000000000000</double>
           </property>
@@ -245,7 +245,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="spinBox_10">
+         <widget class="QSpinBox" name="terminalServiceTimeSpinBox">
           <property name="minimum">
            <number>1</number>
           </property>
@@ -262,7 +262,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="spinBox_11">
+         <widget class="QSpinBox" name="terminalServiceTimePlusMinusSpinBox">
           <property name="minimum">
            <number>1</number>
           </property>
@@ -286,7 +286,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="spinBox_4">
+         <widget class="QSpinBox" name="sendServiceTimeSpinBox">
           <property name="minimum">
            <number>1</number>
           </property>
@@ -306,7 +306,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="spinBox_5">
+         <widget class="QSpinBox" name="sendServiceTimePlusMinusSpinBox">
           <property name="minimum">
            <number>1</number>
           </property>
@@ -330,7 +330,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="spinBox_6">
+         <widget class="QSpinBox" name="getServiceTimeSpinBox">
           <property name="minimum">
            <number>1</number>
           </property>
@@ -350,7 +350,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="spinBox_7">
+         <widget class="QSpinBox" name="getServiceTimePlusMinusSpinBox">
           <property name="minimum">
            <number>1</number>
           </property>
@@ -374,7 +374,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="spinBox_8">
+         <widget class="QSpinBox" name="moneytalksServiceTimeSpinBox">
           <property name="minimum">
            <number>1</number>
           </property>
@@ -394,7 +394,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="spinBox_9">
+         <widget class="QSpinBox" name="moneytalksServiceTimePlusMinusSpinBox">
           <property name="minimum">
            <number>1</number>
           </property>
@@ -439,7 +439,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="spinBox_12">
+         <widget class="QSpinBox" name="maxNumberOfClientsSpinBox">
           <property name="minimum">
            <number>1</number>
           </property>
@@ -477,7 +477,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="goModelingButton">
       <property name="text">
        <string>Смоделировать работу системы</string>
       </property>
@@ -516,7 +516,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_26">
+       <widget class="QLabel" name="denialOfServiceSendWindowResultLabel">
         <property name="text">
          <string/>
         </property>
@@ -533,7 +533,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_28">
+       <widget class="QLabel" name="ProbabilityOfDenialOfServiceSendWindowResultLabel">
         <property name="text">
          <string/>
         </property>
@@ -564,7 +564,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_30">
+       <widget class="QLabel" name="denialOfServiceGetWindowResultLabel">
         <property name="text">
          <string/>
         </property>
@@ -581,7 +581,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_32">
+       <widget class="QLabel" name="ProbabilityOfDenialOfServiceGetWindowResultLabel">
         <property name="text">
          <string/>
         </property>
@@ -612,7 +612,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_34">
+       <widget class="QLabel" name="denialOfServiceMoneytalksWindowResultLabel">
         <property name="text">
          <string/>
         </property>
@@ -629,7 +629,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_36">
+       <widget class="QLabel" name="ProbabilityOfDenialOfServiceMoneytalksWindowResultLabel">
         <property name="text">
          <string/>
         </property>
