@@ -50,36 +50,46 @@ public:
     Processor *emit_request()
     {
         ++n_generated_requests_;
-        double sendToCondition = getUniformInt(0, 1);
-
-        Processor *receiverToReceiveRequest = nullptr;
         if (receivers_.size() == 3)
         {
-            for (size_t i = 0; i < receivers_.size(); i++)
+            Processor *receiver = receivers_[0];
+
+            double currentSum = 0;
+            double chooseRandom = getUniformReal(0, 1);
+            // Бросаем точку на прямую, разделённую на отрезки, суммирование -
+            // рассмотрение отдельного отрезка Господи, до чего я дошёл в своём познании,
+            // Вы бы только знали
+            for (size_t i = 0; i < pValuesToSendTo.size(); i++)
             {
-                qDebug() << receivers_.size();
-                qDebug() << pReturns[i];
-                if (pReturns[i] < sendToCondition)
+                currentSum += pValuesToSendTo[i];
+                if (chooseRandom < currentSum)
                 {
-                    receiverToReceiveRequest = receivers_[i];
+                    receiver = receivers_[i];
+                    break;
+                }
+            }
+
+            if (receiver->receive_request())
+            {
+                qDebug() << "Receive";
+                return receiver;
+            }
+            qDebug() << "Not";
+            return nullptr;
+        }
+        else
+        {
+            for (auto &&receiver : receivers_)
+            {
+                if (receiver->receive_request())
+                {
+                    return receiver;
                 }
             }
         }
-        else
-        {
-            receiverToReceiveRequest = receivers_[0];
-        }
-
-        if (receiverToReceiveRequest)
-        {
-            receiverToReceiveRequest->receive_request();
-        }
-        else
-        {
-            qDebug() << "No receiver to emit request j-j";
-        }
-
-        return receiverToReceiveRequest;
+        if (receivers_.size() == 0)
+            qDebug() << "It's null";
+        return nullptr;
     }
 
     Processor *return_request()
@@ -101,7 +111,7 @@ private:
 
 public:
     double next_event_time;
-    std::vector<double> pReturns;
+    std::vector<double> pValuesToSendTo;
 };
 
 class RequestProcessor : public RequestGenerator, public Processor
@@ -175,16 +185,14 @@ Results doSimulate(const SimulationParameters &parameters)
             parameters.client.timeOfCome + parameters.client.timeDelta);
     });
 
-    RequestProcessor terminal(
-        [=]() {
-            return getUniformReal(
-                parameters.terminal.timeOfService - parameters.terminal.timeDelta,
-                parameters.terminal.timeOfService + parameters.terminal.timeDelta);
-        },
-        std::numeric_limits<int>::max());
-    std::vector<double> pReturns = {parameters.client.probForSendWindow,
-                                    parameters.client.probForGetWindow, parameters.client.probForMoneytalksWindow};
-    terminal.pReturns = pReturns;
+    RequestProcessor terminal([=]() {
+        return getUniformReal(
+            parameters.terminal.timeOfService - parameters.terminal.timeDelta,
+            parameters.terminal.timeOfService + parameters.terminal.timeDelta);
+    });
+    std::vector<double> pValuesToSendTo = {parameters.client.probForSendWindow,
+        parameters.client.probForGetWindow, parameters.client.probForMoneytalksWindow};
+    terminal.pValuesToSendTo = pValuesToSendTo;
     RequestProcessor sendWindow(
         [=]() {
             return getUniformReal(
@@ -216,6 +224,8 @@ Results doSimulate(const SimulationParameters &parameters)
     terminal.add_receiver(&getWindow);
     terminal.add_receiver(&moneytalksWindow);
     sendWindow.set_return_receiver(&terminal);
+    getWindow.set_return_receiver(&terminal);
+    moneytalksWindow.set_return_receiver(&terminal);
 
     const std::array<RequestGenerator *, 5> devices{
         &client_generator, &terminal, &sendWindow, &getWindow, &moneytalksWindow};
@@ -223,14 +233,16 @@ Results doSimulate(const SimulationParameters &parameters)
     client_generator.next_event_time = client_generator.generate_time();
     terminal.next_event_time =
         client_generator.next_event_time + terminal.generate_time();
-    while (client_generator.n_generated_requests() < parameters.client.amount ||
-           terminal.n_queued_requests() > 0 || sendWindow.n_queued_requests() > 0 ||
-           getWindow.n_queued_requests() > 0 || moneytalksWindow.n_queued_requests() > 0)
+    while (client_generator.n_generated_requests() < parameters.client.amount)
     {
+        qDebug() << "In terminal: " << terminal.n_queued_requests();
+        qDebug() << "In first window: " << sendWindow.n_queued_requests();
+        qDebug() << "In second window: " << getWindow.n_queued_requests();
+        qDebug() << "In third window: " << moneytalksWindow.n_queued_requests();
         currentTime = client_generator.next_event_time;
         for (auto &&device : devices)
         {
-            if (0.0 < device->next_event_time && device->next_event_time < currentTime)
+            if (device->next_event_time != 0 && device->next_event_time < currentTime)
             {
                 currentTime = device->next_event_time;
             }
@@ -240,7 +252,7 @@ Results doSimulate(const SimulationParameters &parameters)
         {
             if (currentTime == device->next_event_time)
             {
-                auto processor = dynamic_cast<RequestProcessor *>(device);
+                RequestProcessor *processor = dynamic_cast<RequestProcessor *>(device);
                 if (processor)
                 {
                     processor->process();
@@ -251,6 +263,32 @@ Results doSimulate(const SimulationParameters &parameters)
                     client_generator.next_event_time =
                         currentTime + client_generator.generate_time();
                 }
+            }
+        }
+    }
+
+    while (terminal.n_queued_requests() > 0 || sendWindow.n_queued_requests() > 0 ||
+           getWindow.n_queued_requests() > 0 || moneytalksWindow.n_queued_requests() > 0)
+    {
+        qDebug() << "In terminal: " << terminal.n_queued_requests();
+        qDebug() << "In first window: " << sendWindow.n_queued_requests();
+        qDebug() << "In second window: " << getWindow.n_queued_requests();
+        qDebug() << "In third window: " << moneytalksWindow.n_queued_requests();
+        currentTime = std::numeric_limits<double>::max();
+        for (size_t i = 1; i < devices.size(); i++)
+        {
+            if (devices[i]->next_event_time != 0 &&
+                devices[i]->next_event_time < currentTime)
+            {
+                currentTime = devices[i]->next_event_time;
+            }
+        }
+
+        for (size_t i = 1; i < devices.size(); i++)
+        {
+            if (currentTime == devices[i]->next_event_time)
+            {
+                dynamic_cast<RequestProcessor *>(devices[i])->process();
             }
         }
     }

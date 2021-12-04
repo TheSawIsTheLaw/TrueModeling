@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>790</width>
-    <height>649</height>
+    <height>653</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -154,8 +154,14 @@
             <property name="minimum">
              <double>0.010000000000000</double>
             </property>
+            <property name="maximum">
+             <double>0.990000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
             <property name="value">
-             <double>30.000000000000000</double>
+             <double>0.300000000000000</double>
             </property>
            </widget>
           </item>
@@ -178,10 +184,16 @@
         <item>
          <widget class="QDoubleSpinBox" name="probabilityForGetWindowSpinBox">
           <property name="minimum">
+           <double>0.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>0.990000000000000</double>
+          </property>
+          <property name="singleStep">
            <double>0.010000000000000</double>
           </property>
           <property name="value">
-           <double>50.000000000000000</double>
+           <double>0.500000000000000</double>
           </property>
          </widget>
         </item>
@@ -204,8 +216,14 @@
           <property name="minimum">
            <double>0.010000000000000</double>
           </property>
+          <property name="maximum">
+           <double>0.990000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
           <property name="value">
-           <double>20.000000000000000</double>
+           <double>0.200000000000000</double>
           </property>
          </widget>
         </item>
