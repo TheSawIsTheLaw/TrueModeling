@@ -53,12 +53,21 @@ public:
         double sendToCondition = getUniformInt(0, 1);
 
         Processor *receiverToReceiveRequest = nullptr;
-        for (size_t i = 0; i < receivers_.size(); i++)
+        if (receivers_.size() == 3)
         {
-            if (pReturns[i] < sendToCondition)
+            for (size_t i = 0; i < receivers_.size(); i++)
             {
-                receiverToReceiveRequest = receivers_[i];
+                qDebug() << receivers_.size();
+                qDebug() << pReturns[i];
+                if (pReturns[i] < sendToCondition)
+                {
+                    receiverToReceiveRequest = receivers_[i];
+                }
             }
+        }
+        else
+        {
+            receiverToReceiveRequest = receivers_[0];
         }
 
         if (receiverToReceiveRequest)
@@ -159,12 +168,13 @@ private:
     double p_return_;
 };
 
-Results simulateEvent(const SimulationParameters &parameters)
+Results doSimulate(const SimulationParameters &parameters)
 {
     RequestGenerator client_generator([=]() {
         return getUniformReal(parameters.client.timeOfCome - parameters.client.timeDelta,
             parameters.client.timeOfCome + parameters.client.timeDelta);
     });
+
     RequestProcessor terminal(
         [=]() {
             return getUniformReal(
@@ -172,6 +182,9 @@ Results simulateEvent(const SimulationParameters &parameters)
                 parameters.terminal.timeOfService + parameters.terminal.timeDelta);
         },
         std::numeric_limits<int>::max());
+    std::vector<double> pReturns = {parameters.client.probForSendWindow,
+                                    parameters.client.probForGetWindow, parameters.client.probForMoneytalksWindow};
+    terminal.pReturns = pReturns;
     RequestProcessor sendWindow(
         [=]() {
             return getUniformReal(

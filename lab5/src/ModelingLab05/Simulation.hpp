@@ -30,4 +30,4 @@ struct Results
     } terminal, sendWindow, getWindow, moneytalksWindow;
 };
 
-Results doSimulate(SimulationParameters &parameters);
+Results doSimulate(const SimulationParameters &parameters);
