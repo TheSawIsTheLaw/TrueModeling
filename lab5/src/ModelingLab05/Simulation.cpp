@@ -17,7 +17,7 @@ class Processor
 public:
     virtual ~Processor() {}
 
-    virtual bool getRequest() = 0;
+    virtual void getRequest() = 0;
 };
 
 class RequestGenerator
@@ -26,21 +26,21 @@ public:
     using Generator = std::function<double()>;
 
     RequestGenerator(Generator generator_)
-    : numberOfGeneratedRequests(0)
-    , returnReceiver(nullptr)
-    , generator(generator_)
-    , receivers()
-    , timeOfNextEvent(0.0)
     {
+        numberOfGeneratedRequests = 0;
+        returnReceiver = nullptr;
+        generator = generator_;
+        receivers = std::vector<Processor *>();
+        timeOfNextEvent = 0;
     }
 
     virtual ~RequestGenerator() {}
 
     void subscribeReceiver(Processor *receiver) { receivers.push_back(receiver); }
 
-    double getNextTime() const { return generator(); }
+    double getNextTime() { return generator(); }
 
-    Processor *sendRequest()
+    void sendRequest()
     {
         numberOfGeneratedRequests++;
         if (receivers.size() == 3)
@@ -50,7 +50,7 @@ public:
             double currentSum = 0;
             double chooseRandom = getUniformReal(0, 1);
             // Бросаем точку на прямую, разделённую на отрезки, суммирование -
-            // рассмотрение отдельного отрезка Господи, до чего я дошёл в своём познании,
+            // рассмотрение отдельного отрезка. Господи, до чего я дошёл в своём познании,
             // Вы бы только знали
             for (size_t i = 0; i < pValuesToSendTo.size(); i++)
             {
@@ -62,38 +62,20 @@ public:
                 }
             }
 
-            if (receiver->getRequest())
-            {
-                qDebug() << "Receive";
-                return receiver;
-            }
-            qDebug() << "Not";
-            return nullptr;
+            receiver->getRequest();
         }
         else
         {
-            for (auto &&receiver : receivers)
-            {
-                if (receiver->getRequest())
-                {
-                    return receiver;
-                }
-            }
+            for (auto &&receiver : receivers) { receiver->getRequest(); }
         }
-        if (receivers.size() == 0)
-            qDebug() << "It's null";
-        return nullptr;
     }
 
-    Processor *returnRequestToSubscriber()
+    void returnRequestToSubscriber()
     {
-        if (!returnReceiver)
+        if (returnReceiver)
         {
-            qDebug() << "Return receiver is not defined!";
-            return nullptr;
+            returnReceiver->getRequest();
         }
-        returnReceiver->getRequest();
-        return returnReceiver;
     }
 
 public:
@@ -116,15 +98,14 @@ public:
 
     RequestProcessor(
         Generator generator, int maxOfQueue_ = 0, double probabilityOfReturn_ = 0.0)
-    : RequestGenerator(generator)
-    , Processor()
-    , numberOfRequestsInQueue(0)
-    , numberOfProcessedRequests(0)
-    , numberOfSkippedRequests(0)
-    , maxOfQueue(maxOfQueue_)
-    , numberOfReturns(0)
-    , probabilityOfReturn(probabilityOfReturn_)
+    : RequestGenerator(generator), Processor()
     {
+        numberOfRequestsInQueue = 0;
+        numberOfProcessedRequests = 0;
+        numberOfSkippedRequests = 0;
+        maxOfQueue = maxOfQueue_;
+        numberOfReturns = 0;
+        probabilityOfReturn = probabilityOfReturn_;
     }
 
     ~RequestProcessor() override {}
@@ -143,13 +124,13 @@ public:
                 returnRequestToSubscriber();
             }
         }
+
         timeOfNextEvent = numberOfRequestsInQueue ? currentTime + getNextTime() : 0.0;
     }
 
-    bool getRequest() override
+    void getRequest() override
     {
-        const auto cond = maxOfQueue == 0 || numberOfRequestsInQueue < maxOfQueue;
-        if (cond)
+        if (maxOfQueue == 0 || numberOfRequestsInQueue < maxOfQueue)
         {
             numberOfRequestsInQueue++;
             timeOfNextEvent = numberOfRequestsInQueue ? currentTime + getNextTime() : 0.0;
@@ -158,7 +139,6 @@ public:
         {
             numberOfSkippedRequests++;
         }
-        return cond;
     }
 
 public:
@@ -221,7 +201,7 @@ Results doSimulate(const SimulationParameters &parameters)
     getWindow.returnReceiver = &terminal;
     moneytalksWindow.returnReceiver = &terminal;
 
-    const std::array<RequestGenerator *, 5> devices{
+    std::array<RequestGenerator *, 5> devices{
         &generatorOfClients, &terminal, &sendWindow, &getWindow, &moneytalksWindow};
 
     generatorOfClients.timeOfNextEvent = generatorOfClients.getNextTime();
@@ -289,10 +269,10 @@ Results doSimulate(const SimulationParameters &parameters)
         }
     }
 
-    const auto res = [](const RequestProcessor &processor) {
-        const auto numberOfSkippedRequests = processor.numberOfSkippedRequests;
-        const auto numberOfProcessedRequests = processor.numberOfProcessedRequests;
-        const auto probabilityOfRequestToBeSkipped =
+    auto res = [](RequestProcessor &processor) {
+        int numberOfSkippedRequests = processor.numberOfSkippedRequests;
+        int numberOfProcessedRequests = processor.numberOfProcessedRequests;
+        double probabilityOfRequestToBeSkipped =
             static_cast<double>(numberOfSkippedRequests) /
             (numberOfSkippedRequests + numberOfProcessedRequests);
         return Results::Element{numberOfSkippedRequests, probabilityOfRequestToBeSkipped};
