@@ -1,11 +1,5 @@
 #include "Simulation.hpp"
 
-#include <algorithm>
-#include <array>
-#include <functional>
-#include <limits>
-#include <vector>
-
 #include <QtDebug>
 
 #include "random.hpp"
@@ -122,21 +116,27 @@ Results doSimulate(const SimulationParameters &parameters)
             parameters.client.timeOfCome + parameters.client.timeDelta);
     });
 
-    RequestProcessor operator1([=]() {
-        return getUniformReal(
-            parameters.operator1.timeOfService - parameters.operator1.timeDelta,
-            parameters.operator1.timeOfService + parameters.operator1.timeDelta);
-    });
-    RequestProcessor operator2([=]() {
-        return getUniformReal(
-            parameters.operator2.timeOfService - parameters.operator2.timeDelta,
-            parameters.operator2.timeOfService + parameters.operator2.timeDelta);
-    });
-    RequestProcessor operator3([=]() {
-        return getUniformReal(
-            parameters.operator3.timeOfService - parameters.operator3.timeDelta,
-            parameters.operator3.timeOfService + parameters.operator3.timeDelta);
-    });
+    RequestProcessor operator1(
+        [=]() {
+            return getUniformReal(
+                parameters.operator1.timeOfService - parameters.operator1.timeDelta,
+                parameters.operator1.timeOfService + parameters.operator1.timeDelta);
+        },
+        1);
+    RequestProcessor operator2(
+        [=]() {
+            return getUniformReal(
+                parameters.operator2.timeOfService - parameters.operator2.timeDelta,
+                parameters.operator2.timeOfService + parameters.operator2.timeDelta);
+        },
+        1);
+    RequestProcessor operator3(
+        [=]() {
+            return getUniformReal(
+                parameters.operator3.timeOfService - parameters.operator3.timeDelta,
+                parameters.operator3.timeOfService + parameters.operator3.timeDelta);
+        },
+        1);
 
     RequestProcessor computer1([=]() { return parameters.computer1.timeOfService; });
     RequestProcessor computer2([=]() { return parameters.computer2.timeOfService; });
