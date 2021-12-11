@@ -62,15 +62,12 @@ public:
     using Generator = RequestGenerator::Generator;
 
     RequestProcessor(
-        Generator generator, int maxOfQueue_ = 0, double probabilityOfReturn_ = 0.0)
+        Generator generator, int maxOfQueue_ = 0)
     : RequestGenerator(generator), Processor()
     {
         numberOfRequestsInQueue = 0;
         numberOfProcessedRequests = 0;
-        numberOfSkippedRequests = 0;
         maxOfQueue = maxOfQueue_;
-        numberOfReturns = 0;
-        probabilityOfReturn = probabilityOfReturn_;
     }
 
     ~RequestProcessor() override {}
@@ -83,6 +80,8 @@ public:
             numberOfRequestsInQueue--;
             sendRequest();
         }
+
+        timeOfNextEvent = numberOfRequestsInQueue ? currentTime + getNextTime() : 0.0;
     }
 
     bool getRequest() override
@@ -90,6 +89,11 @@ public:
         if (maxOfQueue == 0 || numberOfRequestsInQueue < maxOfQueue)
         {
             numberOfRequestsInQueue++;
+            if (timeOfNextEvent == 0)
+            {
+                timeOfNextEvent = currentTime + getNextTime();
+            }
+
             return true;
         }
         else
@@ -101,12 +105,9 @@ public:
 public:
     int numberOfRequestsInQueue;
     int numberOfProcessedRequests;
-    int numberOfSkippedRequests;
 
 private:
     int maxOfQueue;
-    int numberOfReturns;
-    double probabilityOfReturn;
 };
 
 Results doSimulate(const SimulationParameters &parameters)
@@ -154,16 +155,18 @@ Results doSimulate(const SimulationParameters &parameters)
 
     int numberOfDenials = 0;
     generatorOfClients.timeOfNextEvent = generatorOfClients.getNextTime();
-    operator1.timeOfNextEvent =
-        operator1.getNextTime() + generatorOfClients.timeOfNextEvent;
 
-    while (generatorOfClients.numberOfGeneratedRequests < parameters.client.amount)
+    while (computer1.numberOfProcessedRequests + computer2.numberOfProcessedRequests <
+           parameters.client.amountOfProccessedNeeded)
     {
-        qDebug() << "In operator1: " << operator1.numberOfRequestsInQueue;
-        qDebug() << "In operator2: " << operator2.numberOfRequestsInQueue;
-        qDebug() << "In operator3: " << operator3.numberOfRequestsInQueue;
-        qDebug() << "In computer1: " << computer1.numberOfRequestsInQueue;
-        qDebug() << "In computer1: " << computer2.numberOfRequestsInQueue;
+        qDebug() << "At time: " << currentTime;
+        qDebug() << "In operator1: " << operator1.numberOfRequestsInQueue << operator1.timeOfNextEvent;
+        qDebug() << "In operator2: " << operator2.numberOfRequestsInQueue << operator2.timeOfNextEvent;
+        qDebug() << "In operator3: " << operator3.numberOfRequestsInQueue << operator3.timeOfNextEvent;
+        qDebug() << "In computer1: " << computer1.numberOfRequestsInQueue
+                 << computer1.numberOfProcessedRequests << computer1.timeOfNextEvent;
+        qDebug() << "In computer2: " << computer2.numberOfRequestsInQueue
+                 << computer2.numberOfProcessedRequests << computer2.timeOfNextEvent;
         currentTime = generatorOfClients.timeOfNextEvent;
         for (auto &&element : schemeElements)
         {
@@ -181,26 +184,15 @@ Results doSimulate(const SimulationParameters &parameters)
                 if (processor)
                 {
                     processor->process();
-
-                    processor->timeOfNextEvent =
-                        (processor->numberOfRequestsInQueue)
-                            ? currentTime + processor->getNextTime()
-                            : 0;
                 }
                 else
                 {
                     Processor *catchProcessor = generatorOfClients.sendRequest();
-                    if (catchProcessor)
+                    if (!catchProcessor)
                     {
-                        RequestProcessor *catchRequestProcessor =
-                            dynamic_cast<RequestProcessor *>(catchProcessor);
-                        catchRequestProcessor->timeOfNextEvent =
-                            currentTime + catchRequestProcessor->getNextTime();
+                        numberOfDenials++;
                     }
-                    else
-                    {
-                        ++numberOfDenials;
-                    }
+
                     generatorOfClients.timeOfNextEvent =
                         currentTime + generatorOfClients.getNextTime();
                 }
@@ -208,6 +200,9 @@ Results doSimulate(const SimulationParameters &parameters)
         }
     }
 
-    return {
-        numberOfDenials, static_cast<double>(numberOfDenials) / parameters.client.amount};
+    return {numberOfDenials,
+        static_cast<double>(numberOfDenials) /
+            (static_cast<double>(numberOfDenials) + operator1.numberOfProcessedRequests +
+                operator2.numberOfProcessedRequests +
+                operator3.numberOfProcessedRequests)};
 }

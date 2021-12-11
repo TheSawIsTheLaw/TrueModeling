@@ -13,7 +13,7 @@ MainWindow::~MainWindow() { delete ui; }
 void MainWindow::on_goModelingButton_clicked()
 {
     SimulationParameters parameters;
-    parameters.client.amount = ui->NumberOfClientsSpinBox->value();
+    parameters.client.amountOfProccessedNeeded = ui->NumberOfClientsSpinBox->value();
     parameters.client.timeOfCome = ui->nextClientIntervalSpinBox->value();
     parameters.client.timeDelta = ui->nextClientIntervalPluxMinusSpinBox->value();
 

@@ -4,7 +4,7 @@ struct SimulationParameters
 {
     struct Client
     {
-        int timeOfCome, timeDelta, amount;
+        int timeOfCome, timeDelta, amountOfProccessedNeeded;
     } client;
 
     struct Operator
