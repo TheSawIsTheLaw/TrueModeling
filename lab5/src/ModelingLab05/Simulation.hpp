@@ -2,17 +2,19 @@
 
 struct SimulationParameters
 {
-    int time, timeDelta;
-    int numberOfRequests;
+    struct Client
+    {
+        int timeOfCome, timeDelta, amount;
+    } client;
 
     struct Operator
     {
-        int serviceTime, timeDelta;
+        int timeOfService, timeDelta;
     } operator1, operator2, operator3;
 
     struct Computer
     {
-        int serviceTime;
+        int timeOfService;
     } computer1, computer2;
 };
 
